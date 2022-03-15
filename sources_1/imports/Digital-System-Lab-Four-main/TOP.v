@@ -135,19 +135,19 @@ SevenSeg sevenseg(
     LEDs_Module led(
         .CLK(CLK),
         .RESET(RESET),
-        .BUS_DATA(BUS_DATA),
-        .BUS_ADDR(BUS_ADDR),
-        .BUS_WE(BUS_WE),
+        .BUS_DATA(bus_data),
+        .BUS_ADDR(bus_addr),
+        .BUS_WE(bus_write_en),
         .LED_OUT(LEDS)
     );
 
 
 
-ILA
-ILA_0
-(
-    .clk(CLK),
-    .probe0(IR_LED)
-);
+//ILA
+//ILA_0
+//(
+//    .clk(CLK),
+//    .probe0(IR_LED)
+//);
 
 endmodule

@@ -143,16 +143,16 @@ U_IRTransmitterSM
 // *****************************
 //Seven segment display
 // *****************************
-SEVEN_SEG 
-U_SEVEN_SEG
-(
-  .CLK    (clk_sm),
-  .RESET  (RESET),
-  .EN     (carrier_en),
-  .COMMAND(data_out[3:0]),
-  .SEL    (SEL),
-  .DIGIT  (DIGIT)
-);
+//SEVEN_SEG 
+//U_SEVEN_SEG
+//(
+//  .CLK    (clk_sm),
+//  .RESET  (RESET),
+//  .EN     (carrier_en),
+//  .COMMAND(data_out[3:0]),
+//  .SEL    (SEL),
+//  .DIGIT  (DIGIT)
+//);
 // *****************************
 
 endmodule
