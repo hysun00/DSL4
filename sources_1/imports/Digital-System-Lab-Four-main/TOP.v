@@ -2,21 +2,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Company: The University of Edinburgh
 // Engineer: Haoyuan Sun
-// 
+//
 // Create Date: 09.03.2022 16:53:20
-// Design Name: 
+// Design Name:
 // Module Name: TOP
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -24,9 +24,13 @@ module TOP
 (
     input  CLK,
     input  RESET,
-    output IR_LED, 
+    output IR_LED,
     output [7:0] DIGIT,
-    output [3:0] SEL
+    output [3:0] SEL,
+    inout CLK_MOUSE,
+    inout DATA_MOUSE,
+    input [1:0] DPI,   // Change DPI using the 2 LSB switches
+    output [15:0] LEDS
 );
 /////////////////////////////////////////////////////////////////////////////////////Internal  Signals/////////////////////////////////////////////////////////////////////////////////////
 wire bus_write_en;
@@ -35,7 +39,7 @@ wire [1:0] bus_interrupts_ack;
 wire [7:0] bus_data;
 wire [7:0] bus_addr;
 wire [7:0] instruction_mem_addr;
-wire [7:0] instruction_mem_data;   
+wire [7:0] instruction_mem_data;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////CPU////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +51,7 @@ CPU
     .BUS_DATA            (bus_data),            // Exclusive data bus.
     .BUS_ADDR            (bus_addr),            // Address the data memory(i.e. RAM) and I/O devices.
     .BUS_WE              (bus_write_en),        // Enable writing.
-    .ROM_ADDRESS         (instruction_mem_addr),// Address the instruction memory(i.e. ROM)        
+    .ROM_ADDRESS         (instruction_mem_addr),// Address the instruction memory(i.e. ROM)
     .ROM_DATA            (instruction_mem_data),// Exclusive instruction bus
     .BUS_INTERRUPTS_RAISE(bus_interrupts_raise),
     .BUS_INTERRUPTS_ACK  (bus_interrupts_ack)
@@ -69,8 +73,8 @@ RAM
 DATA_MEM
 (
     .CLK      (CLK),
-    .BUS_DATA (bus_data),   
-    .BUS_ADDR (bus_addr),   // Address the data memory(i.e. RAM) 
+    .BUS_DATA (bus_data),
+    .BUS_ADDR (bus_addr),   // Address the data memory(i.e. RAM)
     .BUS_WE   (bus_write_en)// Enable writing data to RAM.
 );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,13 +100,48 @@ U_IRTransmitter
     .CLK      (CLK),
     .RESET    (RESET),
     .BUS_WE   (bus_write_en),
-    .BUS_DATA (bus_data),            
-    .BUS_ADDR (bus_addr), 
-    .IR_LED   (IR_LED),
-    .SEL      (SEL),
-    .DIGIT    (DIGIT)
+    .BUS_DATA (bus_data),
+    .BUS_ADDR (bus_addr),
+    .IR_LED   (IR_LED)
+    // .SEL      (SEL),
+    // .DIGIT    (DIGIT)
 );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+PS2_MOUSE mouse(
+        .RESET(RESET),
+        .CLK(CLK),
+        .CLK_MOUSE(CLK_MOUSE),
+        .DATA_MOUSE(DATA_MOUSE),
+        .BUS_DATA(bus_data),
+        .BUS_ADDR(bus_addr),
+        .BUS_WE(bus_write_en),
+        .MOUSE_INTERRUPT_RAISE(bus_interrupts_raise[0]),
+        .MOUSE_INTERRUPT_ACK(bus_interrupts_ack[0]),
+        .DPI(DPI)
+);
+
+SevenSeg sevenseg(
+        .CLK(CLK),
+        .RESET(RESET),
+        .BUS_DATA(bus_data),
+        .BUS_ADDR(bus_addr),
+        .BUS_WE(bus_write_en),
+        .SEG_SELECT_OUT(SEL),
+        .HEX_OUT(DIGIT)
+    );
+
+    LEDs_Module led(
+        .CLK(CLK),
+        .RESET(RESET),
+        .BUS_DATA(BUS_DATA),
+        .BUS_ADDR(BUS_ADDR),
+        .BUS_WE(BUS_WE),
+        .LED_OUT(LEDS)
+    );
+
+
 
 ILA
 ILA_0
