@@ -40,7 +40,7 @@ module RAM(input CLK,
     reg [7:0] Mem [2**RAMAddrWidth-1:0];
 
     // Initialise the memory for data preloading, initialising variables, and declaring constants
-    initial $readmemb("F:/FPGA/PS2_Microprocessor/PS2_Microprocessor.srcs/sources_1/new/Complete_Demo_RAM.txt", Mem);
+    initial $readmemh("Complete_Demo_RAM.txt", Mem);
 
     //single port ram
     always@(posedge CLK) begin

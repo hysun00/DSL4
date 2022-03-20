@@ -102,7 +102,7 @@ module ps2_itrpt(
                 end
 
                 8'hA1: begin
-                    Out <= 8'hA2;
+                    Out <= 8'hA1;
                     MOUSEBusWE <= 1'b1;
                 end
 

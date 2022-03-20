@@ -30,7 +30,7 @@ module ROM(input CLK,
     reg [7:0] ROM [2**RAMAddrWidth-1:0];
 
     // Load program
-    initial $readmemb("F:/FPGA/PS2_Microprocessor/PS2_Microprocessor.srcs/sources_1/new/Complete_Demo_ROM.txt", ROM);
+    initial $readmemh("Complete_Demo_ROM.txt", ROM);
 
     //single port ram
     always@(posedge CLK)

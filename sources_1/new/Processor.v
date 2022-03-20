@@ -134,10 +134,8 @@ module Processor(input CLK,
 
 //TODO: FILL IN THIS AREA
     IF_A_EQUALITY_B_GOTO = 8'h40,
-    BRANCH_TO_ADDR_EQ = 8'h41,
-    BRANCH_TO_ADDR_GREATER = 8'h42,
-    BRANCH_TO_ADDR_LESS = 8'h43,
-    BRANCH_TO_ADDR_0 = 8'h44,
+    IF_A_EQUALITY_B_GOTO_0 = 8'h41,
+    IF_A_EQUALITY_B_GOTO_1 = 8'h42,
 
     GOTO = 8'h50,
     GOTO_0 = 8'h51,
@@ -364,41 +362,20 @@ module Processor(input CLK,
             //TODO: FILL IN THIS AREA
 
             IF_A_EQUALITY_B_GOTO: begin
-                case(ProgMemoryOut[7:4])
-                    4'b1001: NextState = BRANCH_TO_ADDR_EQ;
-                    4'b1010: NextState = BRANCH_TO_ADDR_GREATER;
-                    4'b1011: NextState = BRANCH_TO_ADDR_LESS;
-                    default:
-                    NextState = CurrState;
-                endcase
-                NextProgCounterOffset = 2'b1;
-            end
-
-            BRANCH_TO_ADDR_EQ: begin
-                NextState = BRANCH_TO_ADDR_0;
-                if(CurrRegA == CurrRegB)
-                    NextProgCounter = ProgMemoryOut;
-                else
+                if(AluOut)
+                    NextState = IF_A_EQUALITY_B_GOTO_0;
+                else begin
                     NextProgCounter = CurrProgCounter + 2;
+                    NextState = IF_A_EQUALITY_B_GOTO_1;
+                end
             end
 
-            BRANCH_TO_ADDR_GREATER: begin
-                NextState = BRANCH_TO_ADDR_0;
-                if(CurrRegA > CurrRegB)
-                    NextProgCounter = ProgMemoryOut;
-                else
-                    NextProgCounter = CurrProgCounter + 2;
+            IF_A_EQUALITY_B_GOTO_0: begin
+                NextState = IF_A_EQUALITY_B_GOTO_1;
+                NextProgCounter = ProgMemoryOut;
             end
 
-            BRANCH_TO_ADDR_LESS: begin
-                NextState = BRANCH_TO_ADDR_0;
-                if(CurrRegA < CurrRegB)
-                    NextProgCounter = ProgMemoryOut;
-                else
-                    NextProgCounter = CurrProgCounter + 2;
-            end
-
-            BRANCH_TO_ADDR_0: NextState = CHOOSE_OPP;
+            IF_A_EQUALITY_B_GOTO_1: NextState = CHOOSE_OPP;
 
             GOTO: begin
                 NextState = GOTO_0;
