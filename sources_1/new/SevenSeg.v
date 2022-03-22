@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 15.03.2022 10:22:08
 // Design Name:
@@ -9,7 +9,7 @@
 // Project Name:
 // Target Devices:
 // Tool Versions:
-// Description:
+// Description: Seven segment display
 //
 // Dependencies:
 //
@@ -30,11 +30,12 @@ module SevenSeg(
     output [7:0] HEX_OUT
     );
 
-    reg [7:0] MouseX, MouseY;
+    reg [7:0] MouseX, MouseY;   // Mouse addresses
     wire [1:0] SEG_SELECT_IN;
     wire [4:0] MuxOut;
     wire Bit17TriggerOut;
 
+    // Downsample the clock to 1kHz
     Generic_counter # (.COUNTER_WIDTH(17),
                         .COUNTER_MAX(99999)
                         )
@@ -71,12 +72,14 @@ module SevenSeg(
         .HEX_OUT(HEX_OUT)
         );
 
+
+    // The below part is for data bus reading and writing
     wire [7:0] BufferedBusData;
     reg [7:0] Out;
-    reg MOUSEBusWE;
+    reg SevenSegBusWE;
 
     //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
-    assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
+    assign BUS_DATA = (SevenSegBusWE) ? Out : 8'hZZ;
     assign BufferedBusData = BUS_DATA;
 
     always @(posedge CLK) begin
@@ -84,26 +87,26 @@ module SevenSeg(
             MouseX <= 0;
             MouseY <= 0;
         end
-        else if(BUS_WE) begin
+        else if(BUS_WE) begin   // Write
             case(BUS_ADDR)
                 8'hD0: MouseX <= BufferedBusData;
                 8'hD1: MouseY <= BufferedBusData;
             endcase
-            MOUSEBusWE <= 1'b0;
+            SevenSegBusWE <= 1'b0;
         end
-        else begin
+        else begin  // Read
             case(BUS_ADDR)
                 8'hD0: begin
                     Out <= MouseX;
-                    MOUSEBusWE <= 1'b1;
+                    SevenSegBusWE <= 1'b1;
                 end
 
                 8'hD1: begin
                     Out <= MouseY;
-                    MOUSEBusWE <= 1'b1;
+                    SevenSegBusWE <= 1'b1;
                 end
 
-                default: MOUSEBusWE <= 1'b0;
+                default: SevenSegBusWE <= 1'b0;
             endcase
         end
     end

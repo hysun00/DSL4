@@ -27,7 +27,7 @@ module Top_TB(
     reg CLK=0;
     reg RESET=1;
 
-    Top uut(
+    Micro uut(
         .CLK(CLK),
         .RESET(RESET)
     );

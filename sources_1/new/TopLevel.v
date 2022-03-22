@@ -1,13 +1,13 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 11.03.2022 21:29:36
 // Design Name:
 // Module Name: PS2_Micro
-// Project Name:
-// Target Devices:
+// Project Name: Second Assessment
+// Target Devices: Top module
 // Tool Versions:
 // Description:
 //
@@ -67,7 +67,6 @@ module PS2_Micro(input RESET,
         .ROM_DATA(ROM_DATA),
         .BUS_INTERRUPTS_RAISE(INTERRUPT_RAISE),
         .BUS_INTERRUPTS_ACK(INTERRUPT_ACK)
-        // .RegB(LEDS[15:8])
     );
 
     PS2_MOUSE mouse(
@@ -81,9 +80,6 @@ module PS2_Micro(input RESET,
         .MOUSE_INTERRUPT_RAISE(INTERRUPT_RAISE[0]),
         .MOUSE_INTERRUPT_ACK(INTERRUPT_ACK[0]),
         .DPI(DPI)
-        // .LED_OUT(LEDS[7:0]),
-        // .SEG_SELECT_OUT(SEG_SELECT_OUT),
-        // .HEX_OUT(HEX_OUT)
     );
 
     SevenSeg sevenseg(

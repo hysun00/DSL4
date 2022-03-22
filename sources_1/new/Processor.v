@@ -28,12 +28,8 @@ module Processor(input CLK,
                  output [7:0] ROM_ADDRESS,
                  input [7:0] ROM_DATA,
                  input [1:0] BUS_INTERRUPTS_RAISE,
-                 output [1:0] BUS_INTERRUPTS_ACK,
-                 output [7:0] RegA,
-                 output [7:0] RegB);
-
-    assign RegA = CurrRegB;
-    assign RegB = CurrRegB;
+                 output [1:0] BUS_INTERRUPTS_ACK
+                );
 
     //The main data bus is treated as tristate, so we need a mechanism to handle this.
     //Tristate signals that interface with the main state machine
@@ -133,26 +129,25 @@ module Processor(input CLK,
 */
 
 //TODO: FILL IN THIS AREA
-    IF_A_EQUALITY_B_GOTO = 8'h40,
-    IF_A_EQUALITY_B_GOTO_0 = 8'h41,
-    IF_A_EQUALITY_B_GOTO_1 = 8'h42,
+    IF_A_EQUALITY_B_GOTO = 8'h40,   // Choose address based on ALU result
+    IF_A_EQUALITY_B_GOTO_0 = 8'h41, // ALU result is TRUE
+    IF_A_EQUALITY_B_GOTO_1 = 8'h42, // Wait. Goto ChooseOp.
 
-    GOTO = 8'h50,
-    GOTO_0 = 8'h51,
-    GOTO_1 = 8'h52,
+    GOTO = 8'h50,   // Wait to find what address to goto
+    GOTO_0 = 8'h51, // Address is available
+    GOTO_1 = 8'h52, // Wait. Goto ChooseOp.
 
-    FUNCTION_START = 8'h60,
-    FUNCTION_START_0 = 8'h61,
-    FUNCTION_START_1 = 8'h62,
+    FUNCTION_START = 8'h60,     // Wait to find the function address. Save the Current program counter
+    FUNCTION_START_0 = 8'h61,   // Function address is available
+    FUNCTION_START_1 = 8'h62,   // Wait. Goto ChooseOp
 
-    RETURN = 8'h70,
-    RETURN_0 = 8'h71,
-    RETURN_1 = 8'h72,
+    RETURN = 8'h70,     // Load the saved program counter
+    RETURN_0 = 8'h71,   // Wait. Goto ChooseOp
 
-    DE_REFERENCE_A = 8'h80,
-    DE_REFERENCE_B = 8'h81,
-    DE_REFERENCE_0 = 8'h82,
-    DE_REFERENCE_1 = 8'h83;
+    DE_REFERENCE_A = 8'h80, // Read and save what address to read
+    DE_REFERENCE_B = 8'h81, // Read and save what address to read
+    DE_REFERENCE_0 = 8'h82, // Wait for the read result
+    DE_REFERENCE_1 = 8'h83; // Result is ready. Goto ChooseOp
 
 
     //Sequential part of the State Machine.
@@ -212,14 +207,14 @@ module Processor(input CLK,
                     NextProgCounter  = 8'hFF;
                     NextInterruptAck = 2'b01;
                 end
-                else if (BUS_INTERRUPTS_RAISE[1]) begin //Interrupt Request B. i.e. Timer
+                else if (BUS_INTERRUPTS_RAISE[1]) begin // Interrupt Request B. i.e. Timer
                     NextState        = GET_THREAD_START_ADDR_0;
                     NextProgCounter  = 8'hFE;
                     NextInterruptAck = 2'b10;
                 end
                 else begin
                         NextState        = IDLE;
-                        NextProgCounter  = 8'hFF; //Nothing has happened.
+                        NextProgCounter  = 8'hFF; // Nothing has happened.
                         NextInterruptAck = 2'b00;
                 end
             end
@@ -361,72 +356,90 @@ module Processor(input CLK,
 */
             //TODO: FILL IN THIS AREA
 
+            // IF_A_EQUALITY_B_GOTO: Here starts the Conditional branch pipeline.
+            // Reg A and Reg B must already be set to the desired values. ALU is used to calculate the result
             IF_A_EQUALITY_B_GOTO: begin
-                if(AluOut)
+                if(AluOut)  // ALU result is TRUE
                     NextState = IF_A_EQUALITY_B_GOTO_0;
-                else begin
+                else begin  // ALU result is false
                     NextProgCounter = CurrProgCounter + 2;
                     NextState = IF_A_EQUALITY_B_GOTO_1;
                 end
             end
 
+            // IF_A_EQUALITY_B_GOTO_0: Here starts the conditional branch pipeline
             IF_A_EQUALITY_B_GOTO_0: begin
                 NextState = IF_A_EQUALITY_B_GOTO_1;
                 NextProgCounter = ProgMemoryOut;
             end
 
+            // Wait state for new prog address to settle.
             IF_A_EQUALITY_B_GOTO_1: NextState = CHOOSE_OPP;
 
+            // GOTO: Here starts the GOTO pipeline.
+            //Wait state - to find the address of where we are going to
             GOTO: begin
                 NextState = GOTO_0;
-                NextProgCounterOffset = 2'b1;
             end
 
+            // The address data is now available
             GOTO_0: begin
                 NextState = GOTO_1;
                 NextProgCounter = ProgMemoryOut;
             end
 
+            // Wait state for new prog address to settle.
             GOTO_1: NextState = CHOOSE_OPP;
 
+            // FUNCTION_START: Here starts the FUNCTION pipeline
+            // Wait state - to find the address of where we are going to
             FUNCTION_START:begin
                 NextState = FUNCTION_START_0;
                 NextProgContext = CurrProgCounter + 2;
             end
 
+            // The function address is now available
             FUNCTION_START_0: begin
                 NextState = FUNCTION_START_1;
                 NextProgCounter = ProgMemoryOut;
             end
 
+            // Wait state for new prog address to settle.
             FUNCTION_START_1: NextState = CHOOSE_OPP;
 
-            RETURN: NextState = RETURN_0;
-
-            RETURN_0: begin
-                NextState = RETURN_1;
+            // RETURN: Here starts the RETURN pipeline
+            // Load the program counter
+            RETURN: begin
+                NextState = RETURN_0;
                 NextProgCounter = CurrProgContext;
             end
 
-            RETURN_1: NextState = CHOOSE_OPP;
+            // Wait state for new prog address to settle.
+            RETURN_0: NextState = CHOOSE_OPP;
 
+            // DE_REFERENCE_A: Here starts the DEREFERENCE pipeline
+            // Wait state - to give time for the ROM address to be read. Reg select is set to 0
             DE_REFERENCE_A: begin
                 NextState = DE_REFERENCE_0;
                 NextRegSelect = 1'b0;
                 NextBusAddr = CurrRegA;
             end
 
+            // Wait state - to give time for the ROM address to be read. Reg select is set to 1
             DE_REFERENCE_B: begin
                 NextState = DE_REFERENCE_0;
                 NextRegSelect = 1'b1;
                 NextBusAddr = CurrRegB;
             end
 
+            // Wait state - to give time for the mem data to be read
+            // Increment the program counter here. This must be done 2 clock cycles ahead
             DE_REFERENCE_0: begin
                 NextState = DE_REFERENCE_1;
                 NextProgCounter = CurrProgCounter + 1;
             end
 
+            //The data will now have arrived from memory. Write it to the proper register.
             DE_REFERENCE_1: begin
                 NextState = CHOOSE_OPP;
                 if(!CurrRegSelect)

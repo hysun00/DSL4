@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 15.02.2022 11:16:36
 // Design Name:
@@ -35,9 +35,6 @@ module PS2_MOUSE(input RESET,
                  output reg MOUSE_INTERRUPT_RAISE,
                  input MOUSE_INTERRUPT_ACK,
                  input [1:0] DPI   // Change DPI using the 2 LSB switches
-                //  output [15:0] LED_OUT,
-                //  output [3:0] SEG_SELECT_OUT,
-                //  output [7:0] HEX_OUT
                  );
 
     wire [7:0] MouseX,MouseY;
@@ -59,18 +56,7 @@ module PS2_MOUSE(input RESET,
         .MouseZ(LED_Scroll)
     );
 
-    // PS2_Display Display(
-    //     .CLK(CLK),
-    //     .BUS_DATA(BUS_DATA),
-    //     .BUS_ADDR(BUS_ADDR),
-    //     .MouseX(MouseX),
-    //     .MouseY(MouseY),
-    //     .LED_IN({LED_Scroll, 4'b0, MouseStatus[3],MouseStatus[0],MouseStatus[2],MouseStatus[1]}),
-    //     .LED_OUT(LED_OUT),
-    //     .SEG_SELECT_OUT(SEG_SELECT_OUT),
-    //     .HEX_OUT(HEX_OUT)
-    // );
-
+     // The below part is for data bus reading and writing
     reg [7:0] Out;
     reg MOUSEBusWE;
 
@@ -78,9 +64,15 @@ module PS2_MOUSE(input RESET,
     assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
 
     always @(posedge CLK) begin
-        if(BUS_WE)
+        if(BUS_WE) begin    // Write
+            case(BUS_ADDR)
+                8'hA0: MouseStatus <= BufferedBusData;
+                8'hA1: MouseX <= BufferedBusData;
+                8'hA2: MouseY <= BufferedBusData;
+            endcase
             MOUSEBusWE <= 1'b0;
-        else begin
+        end
+        else begin  // Read
             case(BUS_ADDR)
                 8'hA0: begin
                     Out <= MouseStatus;
@@ -107,12 +99,13 @@ module PS2_MOUSE(input RESET,
         end
     end
 
+    // This part is for mouse interrupt send and receive
     always @(posedge CLK) begin
         if (RESET)
             MOUSE_INTERRUPT_RAISE <= 1'b0;
-        else if (MouseInterrupt)
+        else if (MouseInterrupt)    // Mouse interrupt generated
             MOUSE_INTERRUPT_RAISE <= 1'b1;
-        else if (MOUSE_INTERRUPT_ACK)
+        else if (MOUSE_INTERRUPT_ACK)   // Mouse interrupt acknowledge received
             MOUSE_INTERRUPT_RAISE <= 1'b0;
     end
 

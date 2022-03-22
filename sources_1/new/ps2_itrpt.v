@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 13.03.2022 17:48:03
 // Design Name:
 // Module Name: ps2_itrpt
-// Project Name:
+// Project Name: Second Assessment
 // Target Devices:
 // Tool Versions:
-// Description:
+// Description: This module is only for testbench purpose. It generates and simulate the mouse interrupt.
 //
 // Dependencies:
 //
@@ -23,13 +23,14 @@
 module ps2_itrpt(
     input CLK,
     input RESET,
-    output BUS_INTERRUPT_RAISE,
-    input BUS_INTERRUPT_ACK,
+    output BUS_INTERRUPT_RAISE, // Mouse interrupt raise
+    input BUS_INTERRUPT_ACK,    // Mouse interrupt acknowledge
     input BUS_WE,
     inout [7:0] BUS_DATA,
     input [7:0] BUS_ADDR
     );
 
+    // Downsample the clock
     reg [31:0] DownCounter;
     always@(posedge CLK) begin
         if (RESET)
@@ -57,7 +58,7 @@ module ps2_itrpt(
     reg TargetReached;
     reg InterruptEnable = 1;
     reg [31:0] LastTime;
-    reg [7:0] InterruptRate = 9;
+    reg [7:0] InterruptRate = 9;    // Every nine downcounter signal. For simulation purpose only
     always@(posedge CLK) begin
         if (RESET) begin
             TargetReached <= 1'b0;
@@ -73,22 +74,24 @@ module ps2_itrpt(
             TargetReached <= 1'b0;
     end
 
+    // Send and acknowledge interrupt when generated
     reg Interrupt;
     always@(posedge CLK) begin
         if (RESET)
             Interrupt <= 1'b0;
-        else if (TargetReached)
+        else if (TargetReached) // Interrupt generated
             Interrupt <= 1'b1;
-        else if (BUS_INTERRUPT_ACK)
+        else if (BUS_INTERRUPT_ACK) // Interrupt acknowledge
             Interrupt <= 1'b0;
     end
 
     assign BUS_INTERRUPT_RAISE = Interrupt;
 
+     // The below part is for data bus reading and writing. For test purpose only
     reg [7:0] Out;
     reg MOUSEBusWE;
 
-    //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
+    // Only place data on the bus if the processor is NOT writing, and it is addressing this memory
     assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
 
     always @(posedge CLK) begin

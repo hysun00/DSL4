@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 10.03.2022 21:28:23
 // Design Name:
-// Module Name: Top
+// Module Name:
 // Project Name:
 // Target Devices:
 // Tool Versions:
-// Description:
+// Description: This module only contains microprocessor, without PS2 mouse interface. It is for testbench simulation purpose only
 //
 // Dependencies:
 //
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Top(input CLK,
+module Micro(input CLK,
            input RESET);
 
     wire [7:0] BUS_ADDR, BUS_DATA;
@@ -64,6 +64,7 @@ module Top(input CLK,
         .BUS_INTERRUPTS_ACK(BUS_INTERRUPT_ACK)
     );
 
+    // A test for mouse interrupt
     ps2_itrpt ps2itrpt(
         .CLK(CLK),
         .RESET(RESET),
