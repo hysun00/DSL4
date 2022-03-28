@@ -56,20 +56,17 @@ module PS2_MOUSE(input RESET,
         .MouseZ(LED_Scroll)
     );
 
-     // The below part is for data bus reading and writing
+    // The below part is for data bus reading and writing
+    wire [7:0] BufferedBusData;
     reg [7:0] Out;
     reg MOUSEBusWE;
 
     //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
     assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
+    assign BufferedBusData = BUS_DATA;
 
     always @(posedge CLK) begin
         if(BUS_WE) begin    // Write
-            case(BUS_ADDR)
-                8'hA0: MouseStatus <= BufferedBusData;
-                8'hA1: MouseX <= BufferedBusData;
-                8'hA2: MouseY <= BufferedBusData;
-            endcase
             MOUSEBusWE <= 1'b0;
         end
         else begin  // Read

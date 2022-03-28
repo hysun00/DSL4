@@ -4,10 +4,10 @@
 // Engineer: Yichen Zhang
 //
 // Create Date: 11.03.2022 21:29:36
-// Design Name:
+// Design Name: Top module
 // Module Name: PS2_Micro
 // Project Name: Second Assessment
-// Target Devices: Top module
+// Target Devices:
 // Tool Versions:
 // Description:
 //
