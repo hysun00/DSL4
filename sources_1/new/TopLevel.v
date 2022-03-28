@@ -30,7 +30,10 @@ module TOP
     inout CLK_MOUSE,
     inout DATA_MOUSE,
     input [1:0] DPI,   // Change DPI using the 2 LSB switches
-    output [15:0] LEDS
+    output [15:0] LEDS,
+    output VGA_HS,
+    output VGA_VS,
+    output [7:0] VGA_COLOUR
 );
 /////////////////////////////////////////////////////////////////////////////////////Internal  Signals/////////////////////////////////////////////////////////////////////////////////////
 wire bus_write_en;
@@ -139,6 +142,17 @@ SevenSeg sevenseg(
         .BUS_ADDR(bus_addr),
         .BUS_WE(bus_write_en),
         .LED_OUT(LEDS)
+    );
+
+VGA_Controller VGA (
+        .CLK(CLK),
+        .RESET(RESET),
+        .BUS_DATA(bus_data),
+        .BUS_ADDR(bus_addr),
+        .BUS_WE(bus_write_en),
+        .VGA_COLOUR(VGA_COLOUR),
+        .VGA_HS(VGA_HS),
+        .VGA_VS(VGA_VS)
     );
 
 
