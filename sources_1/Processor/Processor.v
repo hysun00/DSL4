@@ -1,24 +1,23 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:  The University of Edinburgh
-// Engineer: Haoyuan Sun
-// 
-// Create Date: 08.03.2022 09:38:06
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date: 25.03.2022 20:57:19
+// Design Name:
 // Module Name: Processor
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
-
 
 module Processor
 (
@@ -53,25 +52,27 @@ reg  [7:0] CurrRegA;        // General-purpose register a
 reg  [7:0] NextRegA;
 reg  [7:0] CurrRegB;        // General-purpose register b
 reg  [7:0] NextRegB;
-reg  [7:0] CurrProgContext; // Register recording the function call site
-reg  [7:0] NextProgContext;
-reg  [1:0] CurrInterruptAck;// Dedicated Interrupt output lines - one for each interrupt line
-reg  [1:0] NextInterruptAck;
 reg  [7:0] CurrPC;          // Programme counter
 reg  [7:0] NextPC;
+reg  [7:0] CurrProgContext [7:0]; // Register recording the function call site
+reg  [7:0] NextProgContext [7:0];
+reg  [4:0] CurrStackTop;
+reg  [4:0] NextStackTop;
+reg  [1:0] CurrInterruptAck;// Dedicated Interrupt output lines - one for each interrupt line
+reg  [1:0] NextInterruptAck;
 reg  CurrRegSelect;         // Register selection bit
 reg  NextRegSelect;
 reg  CurrPCOffset;          // PC offset
 reg  NextPCOffset;
 reg  CurrBusDataOutWE;      // Write enable
-reg  NextBusDataOutWE; 
+reg  NextBusDataOutWE;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////State  Code////////////////////////////////////////////////////////////////////////////////////////
 // The microprocessor is essentially a state machine, with one sequential pipeline
 // of states for each operation.
 // The current list of operations is:
-// 0:  Read from memory to A 
+// 0:  Read from memory to A
 // 1:  Read from memory to B
 // 2:  Write to memory from A
 // 3:  Write to memory from B
@@ -101,9 +102,9 @@ localparam [7:0] WRITE_TO_MEM_1          = 8'h23;// Write data to data bus by th
 localparam [7:0] DO_MATHS_OPP_SAVE_IN_A  = 8'h30;// The result of maths op. is available, save it to Reg A.
 localparam [7:0] DO_MATHS_OPP_SAVE_IN_B  = 8'h31;// The result of maths op. is available, save it to Reg B.
 localparam [7:0] DO_MATHS_OPP_0          = 8'h32;// Wait for new prog address to settle.
-// Unconditional branch
+// Unconditional branch A and B
 localparam [7:0] IF_A_EQUALITY_B_GOTO    = 8'h40;// Wait for the branch address being read from ROM.
-localparam [7:0] IF_A_EQUALITY_B_GOTO_0  = 8'h41;// Branch to the designated ROM address or go to the consecutive one based on the alu result. 
+localparam [7:0] IF_A_EQUALITY_B_GOTO_0  = 8'h41;// Branch to the designated ROM address or go to the consecutive one based on the alu result.
 localparam [7:0] IF_A_EQUALITY_B_GOTO_1  = 8'h42;
 // Conditional branch
 localparam [7:0] GOTO                    = 8'h50;// Wait for branching address being read from ROM.
@@ -118,10 +119,15 @@ localparam [7:0] FUNCTION_START_1        = 8'h72;
 localparam [7:0] RETURN                  = 8'h80;// Branch to the call site.
 localparam [7:0] RETURN_0                = 8'h81;// Wait for new prog address to settle.
 //Data transfer (impilicit register indirect addressing)
-localparam [7:0] DE_REFERENCE_A          = 8'h90;// Write memory address, which is the content of register A, to ROM 
-localparam [7:0] DE_REFERENCE_B          = 8'h91;// Write memory address, which is the content of register B, to ROM 
+localparam [7:0] DE_REFERENCE_A          = 8'h90;// Write memory address, which is the content of register A, to ROM
+localparam [7:0] DE_REFERENCE_B          = 8'h91;// Write memory address, which is the content of register B, to ROM
 localparam [7:0] DE_REFERENCE_0          = 8'h92;// Waiting for the data being read from ROM
 localparam [7:0] DE_REFERENCE_1          = 8'h93;// Data already read. Write data to the selected register.
+//Data transfer (immdiate)
+localparam [7:0] READ_FROM_IMM_TO_A      = 8'hA0;// Wait for the imm being read from ROM, select reg A.
+localparam [7:0] READ_FROM_IMM_TO_B      = 8'hA1;// Wait for the imm being read from ROM, select reg B.
+localparam [7:0] READ_FROM_IMM_0         = 8'hA2;// Increment the PC by 2.
+localparam [7:0] READ_FROM_IMM_1         = 8'hA3;// Wait for new prog address to settle.
 //Program thread selection
 localparam [7:0] IDLE                    = 8'hF0;// Wait until an interrupt wakes up the processor.
 localparam [7:0] GET_THREAD_START_ADDR_0 = 8'hF1;// Wait for new instruction address to arrive.
@@ -130,7 +136,7 @@ localparam [7:0] GET_THREAD_START_ADDR_2 = 8'hF3;// Wait for the new instruction
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////ALU////////////////////////////////////////////////////////////////////////////////////////////
-ALU 
+ALU
 ALU_0
 (
     .CLK        (CLK),
@@ -144,35 +150,51 @@ ALU_0
 
 ///////////////////////////////////////////////////////////////////////////////////////State Machine///////////////////////////////////////////////////////////////////////////////////////
 //Sequential section
-always@(posedge CLK) 
+always@(posedge CLK)
     if(RESET) begin
-        CurrState        = 8'h00;
-        CurrPC           = 8'h00;
-        CurrPCOffset     = 1'h0;
-        CurrBusAddr      = 8'hFF; 
-        CurrBusDataOut   = 8'h00;
-        CurrBusDataOutWE = 1'b0;
-        CurrRegA         = 8'h00;
-        CurrRegB         = 8'h00;
-        CurrRegSelect    = 1'b0;
-        CurrProgContext  = 8'h00;
-        CurrInterruptAck = 2'b00;
-    end 
+        CurrState        <= 8'h00;
+        CurrPC           <= 8'h00;
+        CurrPCOffset     <= 1'h0;
+        CurrStackTop     <= 4'h0;
+        CurrBusAddr      <= 8'hFF;
+        CurrBusDataOut   <= 8'h00;
+        CurrBusDataOutWE <= 1'b0;
+        CurrRegA         <= 8'h00;
+        CurrRegB         <= 8'h00;
+        CurrRegSelect    <= 1'b0;
+        CurrProgContext[0]  <= 8'h00;
+        CurrProgContext[1]  <= 8'h00;
+        CurrProgContext[2]  <= 8'h00;
+        CurrProgContext[3]  <= 8'h00;
+        CurrProgContext[4]  <= 8'h00;
+        CurrProgContext[5]  <= 8'h00;
+        CurrProgContext[6]  <= 8'h00;
+        CurrProgContext[7]  <= 8'h00;
+        CurrInterruptAck    <= 2'b00;
+    end
     else begin
-        CurrState        = NextState;
-        CurrPC           = NextPC;
-        CurrPCOffset     = NextPCOffset;
-        CurrBusAddr      = NextBusAddr;
-        CurrBusDataOut   = NextBusDataOut;
-        CurrBusDataOutWE = NextBusDataOutWE;
-        CurrRegA         = NextRegA;
-        CurrRegB         = NextRegB;
-        CurrRegSelect    = NextRegSelect;
-        CurrProgContext  = NextProgContext;
-        CurrInterruptAck = NextInterruptAck;
+        CurrState        <= NextState;
+        CurrPC           <= NextPC;
+        CurrPCOffset     <= NextPCOffset;
+        CurrStackTop     <= NextStackTop;
+        CurrBusAddr      <= NextBusAddr;
+        CurrBusDataOut   <= NextBusDataOut;
+        CurrBusDataOutWE <= NextBusDataOutWE;
+        CurrRegA         <= NextRegA;
+        CurrRegB         <= NextRegB;
+        CurrRegSelect    <= NextRegSelect;
+        CurrProgContext[0]  <= NextProgContext[0];
+        CurrProgContext[1]  <= NextProgContext[1];
+        CurrProgContext[2]  <= NextProgContext[2];
+        CurrProgContext[3]  <= NextProgContext[3];
+        CurrProgContext[4]  <= NextProgContext[4];
+        CurrProgContext[5]  <= NextProgContext[5];
+        CurrProgContext[6]  <= NextProgContext[6];
+        CurrProgContext[7]  <= NextProgContext[7];
+        CurrInterruptAck <= NextInterruptAck;
     end
 
-//Combinatorial section 
+//Combinatorial section
 always@(*) begin
     // Default configuration.
     NextState        = CurrState;
@@ -184,7 +206,15 @@ always@(*) begin
     NextRegA         = CurrRegA;
     NextRegB         = CurrRegB;
     NextRegSelect    = CurrRegSelect;
-    NextProgContext  = CurrProgContext;
+    NextStackTop     = CurrStackTop;
+    NextProgContext[0]  = CurrProgContext[0];
+    NextProgContext[1]  = CurrProgContext[1];
+    NextProgContext[2]  = CurrProgContext[2];
+    NextProgContext[3]  = CurrProgContext[3];
+    NextProgContext[4]  = CurrProgContext[4];
+    NextProgContext[5]  = CurrProgContext[5];
+    NextProgContext[6]  = CurrProgContext[6];
+    NextProgContext[7]  = CurrProgContext[7];
     NextInterruptAck = 2'b00;
     case (CurrState)
 ////////////////////////////////////Thread states////////////////////////////////////
@@ -193,15 +223,15 @@ always@(*) begin
                 NextState        = GET_THREAD_START_ADDR_0;
                 NextPC           = 8'hFF;
                 NextInterruptAck = 2'b01;
-            end 
+            end
             else if(BUS_INTERRUPTS_RAISE[1]) begin // Interrupt Request B.
                 NextState        = GET_THREAD_START_ADDR_0;
                 NextPC           = 8'hFE;
                 NextInterruptAck = 2'b10;
-            end 
+            end
             else begin
                 NextState        = IDLE;
-                NextPC           = 8'hFF; 
+                NextPC           = 8'hFF;
                 NextInterruptAck = 2'b00;
             end
         end
@@ -230,6 +260,13 @@ always@(*) begin
                 4'hA:   NextState = RETURN;
                 4'hB:   NextState = DE_REFERENCE_A;
                 4'hC:   NextState = DE_REFERENCE_B;
+                4'hD:   begin
+                    case(ProgMemoryOut[7:4])
+                        4'b0: NextState = READ_FROM_IMM_TO_A;
+                        4'b1: NextState = READ_FROM_IMM_TO_B;
+                        default:NextState = CurrState;
+                    endcase
+                end
                 default:NextState = CurrState;
             endcase
             NextPCOffset = 1'h1;
@@ -257,9 +294,9 @@ always@(*) begin
 
         READ_FROM_MEM_2: begin
             NextState = CHOOSE_OPP;
-            if(!CurrRegSelect) 
+            if(!CurrRegSelect)
                 NextRegA = BusDataIn;
-            else 
+            else
                 NextRegB = BusDataIn;
         end
 //////////////////////////////////Write to Data Bus//////////////////////////////////
@@ -279,12 +316,12 @@ always@(*) begin
             NextState        = WRITE_TO_MEM_1;
             NextBusAddr      = ProgMemoryOut;
             NextBusDataOutWE = 1'b1;
-            if(!NextRegSelect) 
+            if(!NextRegSelect)
                 NextBusDataOut = CurrRegA;
-            else 
-                NextBusDataOut = CurrRegB;           
-        end    
-        
+            else
+                NextBusDataOut = CurrRegB;
+        end
+
         WRITE_TO_MEM_1: NextState = CHOOSE_OPP;
 ////////////////////////////Arithmetic & Logic Operations////////////////////////////
         DO_MATHS_OPP_SAVE_IN_A: begin
@@ -299,55 +336,57 @@ always@(*) begin
             NextPC    = CurrPC + 1;
         end
 
-        DO_MATHS_OPP_0: NextState = CHOOSE_OPP;        
-/////////////////////////////////Conditional  Branch/////////////////////////////////  
-        IF_A_EQUALITY_B_GOTO: 
-            if(AluOut) 
+        DO_MATHS_OPP_0: NextState = CHOOSE_OPP;
+/////////////////////////////////Conditional  Branch/////////////////////////////////
+        IF_A_EQUALITY_B_GOTO:
+            if(AluOut)
                 NextState = IF_A_EQUALITY_B_GOTO_0;
-            else begin       
-                NextPC    = CurrPC + 2; 
+            else begin
+                NextPC    = CurrPC + 2;
                 NextState = IF_A_EQUALITY_B_GOTO_1;
             end
-        
+
         IF_A_EQUALITY_B_GOTO_0: begin
             NextState = IF_A_EQUALITY_B_GOTO_1;
-            NextPC = ProgMemoryOut;        
+            NextPC = ProgMemoryOut;
         end
-        
+
         IF_A_EQUALITY_B_GOTO_1: NextState = CHOOSE_OPP;
 ////////////////////////////////Unconditional  Branch////////////////////////////////
         GOTO: begin
             NextState = GOTO_0;
         end
-        
+
         GOTO_0: begin
             NextPC    = ProgMemoryOut;
             NextState = GOTO_1;
         end
-        
+
         GOTO_1: NextState = CHOOSE_OPP;
 //////////////////////////////////Go  to Idle State//////////////////////////////////
         GOTO_IDLE: NextState = IDLE;
 ////////////////////////////////////Call Function////////////////////////////////////
         FUNCTION_START: begin
-            NextProgContext = CurrPC + 2;
-            NextState       = FUNCTION_START_0;
+            NextProgContext[CurrStackTop] = CurrPC + 2;
+            NextStackTop                  = CurrStackTop+1;
+            NextState                     = FUNCTION_START_0;
         end
-        
+
         FUNCTION_START_0: begin
             NextPC    = ProgMemoryOut;
             NextState = FUNCTION_START_1;
         end
-        
+
         FUNCTION_START_1: NextState = CHOOSE_OPP;
 ////////////////////////////////////////Return///////////////////////////////////////
         RETURN: begin
-            NextPC    = CurrProgContext;
-            NextState = RETURN_0;
+            NextPC       = CurrProgContext[CurrStackTop-1];
+            NextStackTop = CurrStackTop-1;
+            NextState    = RETURN_0;
         end
-        
+
         RETURN_0: NextState = CHOOSE_OPP;
-////////////////////////////////////De-reference///////////////////////////////////// 
+////////////////////////////////////De-reference/////////////////////////////////////
         DE_REFERENCE_A: begin
             NextState     = DE_REFERENCE_0;
             NextBusAddr   = CurrRegA;
@@ -361,22 +400,45 @@ always@(*) begin
         end
 
         DE_REFERENCE_0: begin
-            NextState = DE_REFERENCE_1;       
+            NextState = DE_REFERENCE_1;
             NextPC    = CurrPC + 1;
         end
 
         DE_REFERENCE_1: begin
             NextState = CHOOSE_OPP;
-            if(!CurrRegSelect) 
+            if(!CurrRegSelect)
                 NextRegA = BusDataIn;
-            else 
-                NextRegB = BusDataIn;        
+            else
+                NextRegB = BusDataIn;
         end
-/////////////////////////////////////////////////////////////////////////////////////        
+////////////////////////////////////Immdiate Data/////////////////////////////////////
+        READ_FROM_IMM_TO_A: begin
+            NextState     = READ_FROM_IMM_0;
+            NextRegSelect = 1'b0;
+        end
+
+        READ_FROM_IMM_TO_B: begin
+            NextState     = READ_FROM_IMM_0;
+            NextRegSelect = 1'b1;
+        end
+
+        READ_FROM_IMM_0:begin
+            NextState = READ_FROM_IMM_1;
+            NextPC    = CurrPC + 2;
+            if(!CurrRegSelect)
+                NextRegA = ProgMemoryOut;
+            else
+                NextRegB = ProgMemoryOut;
+        end
+
+        READ_FROM_IMM_1:begin
+            NextState     = CHOOSE_OPP;
+        end
+/////////////////////////////////////////////////////////////////////////////////////
     endcase
  end
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 // Output(or inout) ports
 assign BUS_INTERRUPTS_ACK = CurrInterruptAck;
 assign BUS_WE             = CurrBusDataOutWE;
@@ -386,5 +448,14 @@ assign ROM_ADDRESS        = CurrPC + CurrPCOffset;
 // Input(or inout) ports
 assign BusDataIn          = BUS_DATA;
 assign ProgMemoryOut      = ROM_DATA;
+
+
+    // ila_0 ILA_0(
+    //     .clk(CLK),
+    //     .probe0(ROM_ADDRESS),
+    //     .probe1(ROM_DATA),
+    //     .probe2(BUS_ADDR),
+    //     .probe3(BUS_DATA)
+    // );
 
 endmodule

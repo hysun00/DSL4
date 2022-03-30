@@ -63,4 +63,6 @@
 !*.bmm
 !*.xmp
 
+ip/
+
 # End of https://www.toptal.com/developers/gitignore/api/xilinxvivado

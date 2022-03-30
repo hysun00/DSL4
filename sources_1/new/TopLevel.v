@@ -29,7 +29,7 @@ module TOP
     output [3:0] SEL,
     inout CLK_MOUSE,
     inout DATA_MOUSE,
-    input [1:0] DPI,   // Change DPI using the 2 LSB switches
+    input [15:0] SW,   // Change DPI using the 2 LSB switches
     output [15:0] LEDS,
     output VGA_HS,
     output VGA_VS,
@@ -91,8 +91,8 @@ U_Timer
     .BUS_DATA            (bus_data),            // Exclusive data bus.
     .BUS_ADDR            (bus_addr),            // Address the timer
     .BUS_WE              (bus_write_en),        // Enable writing to timer.
-    .BUS_INTERRUPT_RAISE (bus_interrupts_raise[1]),
-    .BUS_INTERRUPT_ACK   (bus_interrupts_ack[1])
+    .BUS_INTERRUPT_RAISE (bus_interrupts_raise[0]),
+    .BUS_INTERRUPT_ACK   (bus_interrupts_ack[0])
 );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -120,9 +120,9 @@ PS2_MOUSE mouse(
         .BUS_DATA(bus_data),
         .BUS_ADDR(bus_addr),
         .BUS_WE(bus_write_en),
-        .MOUSE_INTERRUPT_RAISE(bus_interrupts_raise[0]),
-        .MOUSE_INTERRUPT_ACK(bus_interrupts_ack[0]),
-        .DPI(DPI)
+        .MOUSE_INTERRUPT_RAISE(bus_interrupts_raise[1]),
+        .MOUSE_INTERRUPT_ACK(bus_interrupts_ack[1]),
+        .DPI(SW[1:0])
 );
 
 SevenSeg sevenseg(
@@ -150,6 +150,7 @@ VGA_Controller VGA (
         .BUS_DATA(bus_data),
         .BUS_ADDR(bus_addr),
         .BUS_WE(bus_write_en),
+        .BACKFORE(SW[2]),
         .VGA_COLOUR(VGA_COLOUR),
         .VGA_HS(VGA_HS),
         .VGA_VS(VGA_VS)

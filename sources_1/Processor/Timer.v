@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 08.03.2022 17:03:26
-// Design Name: 
+// Design Name:
 // Module Name: Timer
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -29,12 +29,12 @@ module Timer
     inout  [7:0] BUS_DATA,
     input  [7:0] BUS_ADDR,
     input  BUS_WE,
-    input  BUS_INTERRUPT_ACK,   
+    input  BUS_INTERRUPT_ACK,
     output BUS_INTERRUPT_RAISE
 );
- 
+
 localparam [7:0] TimerBaseAddr   = 8'hF0;// Timer Base Address in the Memory Map
-localparam InitialIterruptRate   = 10;  // Default interrupt rate leading to 1 interrupt every 100 ms
+localparam InitialIterruptRate   = 100;  // Default interrupt rate leading to 1 interrupt every 100 ms
 localparam InitialIterruptEnable = 1'b1; // By default the Interrupt is Enabled
 //////////////////////
 //BaseAddr + 0 -> reports current timer value
@@ -109,12 +109,12 @@ always@(posedge CLK) begin
     if(RESET) begin
         TargetReached <= 1'b0;
         LastTime <= 0;
-    end 
+    end
     else if((LastTime + InterruptRate) == Timer) begin
         if(InterruptEnable)
             TargetReached <= 1'b1;
         LastTime <= Timer;
-    end 
+    end
     else
         TargetReached <= 1'b0;
 end

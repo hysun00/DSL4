@@ -98,9 +98,9 @@ module PS2_MOUSE(input RESET,
 
     // This part is for mouse interrupt send and receive
     always @(posedge CLK) begin
-        if (RESET)
-            MOUSE_INTERRUPT_RAISE <= 1'b0;
-        else if (MouseInterrupt)    // Mouse interrupt generated
+        // if (RESET)
+        //     MOUSE_INTERRUPT_RAISE <= 1'b0;
+        if (MouseInterrupt || RESET)    // Mouse interrupt generated
             MOUSE_INTERRUPT_RAISE <= 1'b1;
         else if (MOUSE_INTERRUPT_ACK)   // Mouse interrupt acknowledge received
             MOUSE_INTERRUPT_RAISE <= 1'b0;
