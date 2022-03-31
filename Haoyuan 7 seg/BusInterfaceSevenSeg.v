@@ -1,26 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-<<<<<<<< HEAD:sources_1/new/BusInterfaceIR.v
-// Company:
-// Engineer:
-//
-// Create Date: 31.03.2022 21:12:33
-// Design Name:
-// Module Name: BusInterfaceIR
-// Project Name:
-// Target Devices:
-// Tool Versions:
-// Description:
-//
-// Dependencies:
-//
-========
 // Company: 
 // Engineer: 
 // 
-// Create Date: 25.03.2022 22:01:53
+// Create Date: 25.03.2022 23:03:31
 // Design Name: 
-// Module Name: BusInterfaceIR
+// Module Name: BusInterfaceSevenSeg
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -28,17 +13,16 @@
 // 
 // Dependencies: 
 // 
->>>>>>>> dd197d5387212e680b2f47e6f626ef37e15dfb15:sources_1/IR/BusInterfaceIR.v
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-//
+// 
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module BusInterfaceIR
+module BusInterfaceSevenSeg
 #(
-    parameter IO_ADDRESS = 8'h90
+    parameter IO_ADDRESS = 8'hD0
 )
 (
     input  CLK,
@@ -52,14 +36,27 @@ module BusInterfaceIR
 reg [7:0] data_out;
 
 always@(posedge CLK)
-    if (RESET)
+    if (RESET) 
         data_out <= 8'h0;
-    else
-        if(BUS_WE & (ADDR == IO_ADDRESS) )
+    else 
+        if(BUS_WE & (ADDR == IO_ADDRESS) ) 
             data_out <= DATA_IN;
-        else
+        else 
             data_out <= data_out;
 
-assign DATA_OUT = data_out;
 
+//always@(posedge CLK)
+//    if (RESET) 
+//        data_out <= 8'h0;
+//    else if(BUS_WE)
+//        case(ADDR)
+//            IO_ADDRESS:  data_out <= DATA_IN;
+//            IO_ADDRESS+1:data_out <= data_out;
+//            default:     data_out <= data_out;  
+//        endcase       
+//    else 
+//            data_out <= data_out;
+
+assign DATA_OUT = data_out;   
 endmodule
+
