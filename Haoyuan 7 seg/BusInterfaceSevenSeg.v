@@ -41,7 +41,7 @@ always@(posedge CLK)
     else if(BUS_WE)
         case(ADDR)
             IO_ADDRESS:  data_out <= DATA_IN;
-            IO_ADDRESS+1:data_out <= 8'h0;
+            IO_ADDRESS+1:data_out <= data_out;
             default:     data_out <= data_out;  
         endcase       
     else 
