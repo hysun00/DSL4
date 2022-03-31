@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 09.03.2022 17:16:04
+// Create Date: 25.03.2022 21:58:38
 // Design Name: 
-// Module Name: ClockDivider
+// Module Name: TenHz_cnt
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ClockDivider
+module TenHz_cnt
 #(
     parameter IN_MHZ        = 100,
     parameter OUT_KHZ       = 0.01,

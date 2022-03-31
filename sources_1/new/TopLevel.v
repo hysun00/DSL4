@@ -106,8 +106,6 @@ U_IRTransmitter
     .BUS_DATA (bus_data),
     .BUS_ADDR (bus_addr),
     .IR_LED   (IR_LED)
-    // .SEL      (SEL),
-    // .DIGIT    (DIGIT)
 );
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,15 +123,17 @@ PS2_MOUSE mouse(
         .DPI(SW[1:0])
 );
 
-SevenSeg sevenseg(
-        .CLK(CLK),
-        .RESET(RESET),
-        .BUS_DATA(bus_data),
-        .BUS_ADDR(bus_addr),
-        .BUS_WE(bus_write_en),
-        .SEG_SELECT_OUT(SEL),
-        .HEX_OUT(DIGIT)
-    );
+SevenSeg
+U_SevenSeg
+(
+    .CLK      (CLK),
+    .RESET    (RESET),
+    .BUS_DATA (bus_data),
+    .BUS_ADDR (bus_addr),
+    .BUS_WE   (bus_write_en),
+    .SEL      (SEL),
+    .DIGIT    (DIGIT)
+);
 
     LEDs_Module led(
         .CLK(CLK),
@@ -155,14 +155,5 @@ VGA_Controller VGA (
         .VGA_HS(VGA_HS),
         .VGA_VS(VGA_VS)
     );
-
-
-
-//ILA
-//ILA_0
-//(
-//    .clk(CLK),
-//    .probe0(IR_LED)
-//);
 
 endmodule

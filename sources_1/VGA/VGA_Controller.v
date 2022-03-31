@@ -26,7 +26,7 @@ module VGA_Controller(
     wire [14:0] VGA_ADDR;
     wire B_DATA;
 
-    reg [10:0] Time_RAM [number_height*number_width-1:0];
+    reg [10:0] Time_RAM [number_height * number_width - 1:0];
 
     initial $readmemb("Numbers_VGA_RAM.txt", Time_RAM);
 
@@ -34,6 +34,7 @@ module VGA_Controller(
     Frame_Buffer frame_buffer(
                          /// Port A - Read/Write
                          .A_CLK(CLK),
+                         .RESET(RESET),
                          .A_ADDR(A_ADDR), // 8 + 7 bits = 15 bits hence [14:0]
                          .A_DATA_IN(A_DATA_IN), // Pixel Data In
                          .A_DATA_OUT(A_DATA_OUT),
@@ -120,30 +121,44 @@ module VGA_Controller(
 
     localparam [9:0] number_height = 10'd44;
     localparam [9:0] number_width = 10'd31;
-    localparam [9:0] number_startx = 10'd220;
-    localparam [9:0] number_starty = 10'd190;
+    localparam [9:0] number_startx = 10'd238;
+    localparam [9:0] number_starty = 10'd218;
 
     always@(posedge CLK) begin
-        if(ADDRH >= number_startx+number_width*4 && ADDRH < number_startx+number_width*5 && ADDRV >= number_starty && ADDRV < number_starty+number_height) begin
-            numberx<=ADDRH-(number_startx+number_width*4);
-            numbery<=ADDRV-number_starty;
-            number_addr=numbery*number_width+numberx;
+        if(ADDRH >= number_startx + number_width * 4 && ADDRH < number_startx + number_width * 5 && ADDRV >= number_starty && ADDRV < number_starty + number_height) begin
+            numberx <= ADDRH - (number_startx + number_width * 4);
+            numbery <= ADDRV - number_starty;
+            number_addr = numbery * number_width + numberx;
 
             VGA_DATA=Time_RAM[number_addr][sec0];
         end
-        else if(ADDRH >= number_startx+number_width*3 && ADDRH < number_startx+number_width*4 && ADDRV >= number_starty && ADDRV < number_starty+number_height) begin
-            numberx<=ADDRH-(number_startx+number_width*3);
-            numbery<=ADDRV-number_starty;
-            number_addr=numbery*number_width+numberx;
+        else if(ADDRH >= number_startx + number_width * 3 && ADDRH < number_startx + number_width * 4 && ADDRV >= number_starty && ADDRV < number_starty + number_height) begin
+            numberx<=ADDRH - (number_startx + number_width * 3);
+            numbery<=ADDRV - number_starty;
+            number_addr=numbery * number_width + numberx;
 
             VGA_DATA=Time_RAM[number_addr][sec1];
         end
-        else if(ADDRH >= number_startx+number_width*2 && ADDRH < number_startx+number_width*3 && ADDRV >= number_starty && ADDRV < number_starty+number_height) begin
-            numberx<=ADDRH-(number_startx+number_width*2);
-            numbery<=ADDRV-number_starty;
-            number_addr=numbery*number_width+numberx;
+        else if(ADDRH >= number_startx + number_width * 2 && ADDRH < number_startx + number_width * 3 && ADDRV >= number_starty && ADDRV < number_starty + number_height) begin
+            numberx<=ADDRH-(number_startx + number_width * 2);
+            numbery<=ADDRV - number_starty;
+            number_addr=numbery * number_width + numberx;
 
             VGA_DATA=Time_RAM[number_addr][10];
+        end
+        else if(ADDRH >= number_startx + number_width * 1 && ADDRH < number_startx + number_width * 2 && ADDRV >= number_starty && ADDRV < number_starty + number_height) begin
+            numberx<=ADDRH-(number_startx + number_width * 1);
+            numbery<=ADDRV - number_starty;
+            number_addr=numbery * number_width + numberx;
+
+            VGA_DATA=Time_RAM[number_addr][min0];
+        end
+        else if(ADDRH >= number_startx + number_width * 0 && ADDRH < number_startx + number_width * 1 && ADDRV >= number_starty && ADDRV < number_starty + number_height) begin
+            numberx<=ADDRH-(number_startx + number_width * 0);
+            numbery<=ADDRV - number_starty;
+            number_addr=numbery * number_width + numberx;
+
+            VGA_DATA=Time_RAM[number_addr][min1];
         end
         else
             VGA_DATA<=B_DATA;
@@ -161,7 +176,7 @@ module VGA_Controller(
         if(RESET) begin
             CONFIG_COLOUR <= 16'b0000111111000000;
         end
-        if (BUS_WE) begin
+        else if (BUS_WE) begin
             VGABusWE <= 1'b0;
 
             // X coordinate
@@ -173,7 +188,8 @@ module VGA_Controller(
 
                 8'hB1: begin
                     A_WE <= 1'b0;
-                    A_ADDR[14:8] <= MouseLimitY - BUS_DATA[6:0] -1;
+                    // A_ADDR[14:8] <= MouseLimitY - BUS_DATA[6:0] -1;
+                    A_ADDR[14:8] <= BUS_DATA[6:0];
                 end
 
                 8'hB2: begin
@@ -185,11 +201,18 @@ module VGA_Controller(
                     A_WE <= 1'b0;
                     if(pre_colour != BUS_DATA) begin
                         pre_colour <= BUS_DATA;
-                        if(BACKFORE)
+                        if(BACKFORE) begin
                             CONFIG_COLOUR[7:0] <= CONFIG_COLOUR[7:0] + 1;
-                        else
+                        end
+                        else begin
                             CONFIG_COLOUR[15:8] <= CONFIG_COLOUR[15:8] + 1;
+                        end
                     end
+                end
+
+                8'hB4: begin
+                    A_WE <= 1'b0;
+
                 end
                 default: A_WE <= 1'b0;
             endcase

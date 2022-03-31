@@ -1,28 +1,28 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 09.03.2022 13:10:21
-// Design Name: 
-// Module Name: BusInterface
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Company:
+// Engineer:
+//
+// Create Date: 31.03.2022 20:59:46
+// Design Name:
+// Module Name: BusInterfaceSevenSeg
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ReadOnlyBusInterface
+module BusInterfaceSevenSeg
 #(
-    parameter IO_ADDRESS = 8'h90
+    parameter IO_ADDRESS = 8'hD0
 )
 (
     input  CLK,
@@ -36,14 +36,16 @@ module ReadOnlyBusInterface
 reg [7:0] data_out;
 
 always@(posedge CLK)
-    if (RESET) 
+    if (RESET)
         data_out <= 8'h0;
-    else 
-        if(BUS_WE & (ADDR == IO_ADDRESS) ) 
-            data_out <= DATA_IN;
-        else 
+    else if(BUS_WE)
+        case(ADDR)
+            IO_ADDRESS:  data_out <= DATA_IN;
+            IO_ADDRESS+1:data_out <= data_out;
+            default:     data_out <= data_out;
+        endcase
+    else
             data_out <= data_out;
 
 assign DATA_OUT = data_out;
-
 endmodule
