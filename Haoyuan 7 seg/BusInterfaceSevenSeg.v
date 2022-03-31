@@ -38,14 +38,25 @@ reg [7:0] data_out;
 always@(posedge CLK)
     if (RESET) 
         data_out <= 8'h0;
-    else if(BUS_WE)
-        case(ADDR)
-            IO_ADDRESS:  data_out <= DATA_IN;
-            IO_ADDRESS+1:data_out <= data_out;
-            default:     data_out <= data_out;  
-        endcase       
     else 
+        if(BUS_WE & (ADDR == IO_ADDRESS) ) 
+            data_out <= DATA_IN;
+        else 
             data_out <= data_out;
+
+
+//always@(posedge CLK)
+//    if (RESET) 
+//        data_out <= 8'h0;
+//    else if(BUS_WE)
+//        case(ADDR)
+//            IO_ADDRESS:  data_out <= DATA_IN;
+//            IO_ADDRESS+1:data_out <= data_out;
+//            default:     data_out <= data_out;  
+//        endcase       
+//    else 
+//            data_out <= data_out;
 
 assign DATA_OUT = data_out;   
 endmodule
+
