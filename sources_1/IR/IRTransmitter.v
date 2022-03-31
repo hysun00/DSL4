@@ -3,7 +3,7 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 09.03.2022 17:14:43
+// Create Date: 25.03.2022 21:56:21
 // Design Name: 
 // Module Name: IRTransmitter
 // Project Name: 
@@ -35,13 +35,11 @@ module IRTransmitter
  // INPUT
     input CLK, //IN_MHZ  
     input RESET,
-    input  BUS_WE,
+    input BUS_WE,
     input [7:0] BUS_ADDR,
     input [7:0] BUS_DATA,
  // OUTPUT   
-    output IR_LED,
-    output [3:0] SEL,
-    output [7:0] DIGIT
+    output IR_LED
 );
 
 // *****************************
@@ -50,18 +48,17 @@ module IRTransmitter
 wire clk_10hz;   //10HZ, 50% duty
 wire send_packet;//10HZ, edge detector
 wire clk_sm;     //working clock and carier wave, 50%duty
-wire carrier_en; 
 wire [7:0] data_out;
 // *****************************
 
 // *****************************
-// Define internal signals
+// Bus Interface
 // *****************************
-ReadOnlyBusInterface
+BusInterfaceIR
 #(
     .IO_ADDRESS(IO_ADDRESS)         
 )
-U_ReadOnlyBusInterface
+U_BusInterfaceIR
 (
     .CLK     (CLK),
     .RESET   (RESET),
@@ -75,7 +72,7 @@ U_ReadOnlyBusInterface
 // *****************************
 // 10HZ clock 
 // *****************************
-ClockDivider
+TenHz_cnt
 #(
     .IN_MHZ       (IN_MHZ),
     .OUT_KHZ      (0.01),
@@ -102,7 +99,7 @@ U_EdgeDetector
 // Working clock for state machine
 // 50% duty, 0 phase shift
 // *****************************
-ClockDivider
+TenHz_cnt
 #(
     .IN_MHZ       (IN_MHZ),
     .OUT_KHZ      (SM_KHZ),
@@ -135,24 +132,8 @@ U_IRTransmitterSM
     .CLK        (clk_sm),
     .SEND_PACKET(send_packet),
     .COMMAND    (data_out[3:0]),
-    .CARRIER_EN (carrier_en),
     .IR_LED     (IR_LED)
 );
-// *****************************
-
-// *****************************
-//Seven segment display
-// *****************************
-//SEVEN_SEG 
-//U_SEVEN_SEG
-//(
-//  .CLK    (clk_sm),
-//  .RESET  (RESET),
-//  .EN     (carrier_en),
-//  .COMMAND(data_out[3:0]),
-//  .SEL    (SEL),
-//  .DIGIT  (DIGIT)
-//);
 // *****************************
 
 endmodule
