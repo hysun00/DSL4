@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+
 module IRTransmitterSM
 #(
  // Yellow car
@@ -36,11 +37,11 @@ module IRTransmitterSM
     input SEND_PACKET,
     input [3:0] COMMAND,
  // OUTPUT   
-    output IR_LED,
-    output reg CARRIER_EN
+    output IR_LED
 );
 
 // Internal signals
+reg carrier_en;
 reg [2:0] curr_state;
 reg [2:0] next_state;
 reg [COUNTER_WIDTH-1:0] curr_count;
@@ -124,45 +125,45 @@ always@(*)
 // *****************************
 always@(*)
     case(curr_state)
-        IDLE:       CARRIER_EN = 1'b0;
+        IDLE:       carrier_en = 1'b0;
                                
-        START:      if (curr_count <= START_BURST_SIZE ) CARRIER_EN = 1'b1;           
-                    else CARRIER_EN = 1'b0;           
+        START:      if (curr_count <= START_BURST_SIZE ) carrier_en = 1'b1;           
+                    else carrier_en = 1'b0;           
                                   
         CAR_SELECT: if (curr_count <= START_BURST_SIZE + GAP_SIZE + CAR_SELECT_BURST_SIZE) 
-                        CARRIER_EN = 1'b1; 
-                    else CARRIER_EN = 1'b0; 
+                        carrier_en = 1'b1; 
+                    else carrier_en = 1'b0; 
                                                       
         RIGHT:      if (curr_count <= START_BURST_SIZE + GAP_SIZE + CAR_SELECT_BURST_SIZE + GAP_SIZE
                                       + ASSERT_BURST_SIZE -(~|COMMAND[0]*DEASSERT_BURST_SIZE) )                             
-                        CARRIER_EN = 1'b1;
-                    else CARRIER_EN = 1'b0;
+                        carrier_en = 1'b1;
+                    else carrier_en = 1'b0;
                         
         LEFT:       if (curr_count <= START_BURST_SIZE + GAP_SIZE + CAR_SELECT_BURST_SIZE + GAP_SIZE
                                       + ASSERT_BURST_SIZE -(~|COMMAND[0]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[1]*DEASSERT_BURST_SIZE) )           
-                        CARRIER_EN = 1'b1;
-                    else CARRIER_EN = 1'b0;
+                        carrier_en = 1'b1;
+                    else carrier_en = 1'b0;
                                        
         BACKWARD:   if (curr_count <= START_BURST_SIZE + GAP_SIZE + CAR_SELECT_BURST_SIZE + GAP_SIZE
                                       + ASSERT_BURST_SIZE -(~|COMMAND[0]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[1]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[2]*DEASSERT_BURST_SIZE) )           
-                        CARRIER_EN = 1'b1;
-                    else CARRIER_EN = 1'b0;
+                        carrier_en = 1'b1;
+                    else carrier_en = 1'b0;
                                                
         FORWARD:    if (curr_count <= START_BURST_SIZE + GAP_SIZE + CAR_SELECT_BURST_SIZE + GAP_SIZE
                                       + ASSERT_BURST_SIZE -(~|COMMAND[0]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[1]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[2]*DEASSERT_BURST_SIZE) + GAP_SIZE 
                                       + ASSERT_BURST_SIZE -(~|COMMAND[3]*DEASSERT_BURST_SIZE) )          
-                        CARRIER_EN = 1'b1;
-                    else CARRIER_EN = 1'b0;
+                        carrier_en = 1'b1;
+                    else carrier_en = 1'b0;
                                                       
-        default: CARRIER_EN = 1'b0;        
+        default: carrier_en = 1'b0;        
     endcase
 // *****************************
 
-assign IR_LED = ( CARRIER_EN == 1'b1 ) ? CLK : 1'b0;
+assign IR_LED = ( carrier_en == 1'b1 ) ? CLK : 1'b0;
 
 endmodule
