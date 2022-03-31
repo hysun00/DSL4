@@ -66,17 +66,18 @@ module VGA_Controller(
     reg [12:0] number_addr;
     wire [3:0] min0,sec0;
     wire [2:0] min1,sec1;
-    wire Bit27TriggerOut, SEC0, SEC1, MIN0;
+    wire SEC0, SEC1, MIN0;
+    wire sec_en;
 
-    Generic_counter # (.COUNTER_WIDTH(27),
-                        .COUNTER_MAX(99999999)
-                        )
-                        Bit27Counter (
-                        .CLK(CLK),
-                        .RESET(RESET),
-                        .ENABLE(1'b1),
-                        .TRIG_OUT(Bit27TriggerOut)
-                        );
+    // Generic_counter # (.COUNTER_WIDTH(27),
+    //                     .COUNTER_MAX(99999999)
+    //                     )
+    //                     Bit27Counter (
+    //                     .CLK(CLK),
+    //                     .RESET(RESET),
+    //                     .ENABLE(1'b1),
+    //                     .TRIG_OUT(Bit27TriggerOut)
+    //                     );
 
     Generic_counter # (.COUNTER_WIDTH(4),
                         .COUNTER_MAX(9)
@@ -84,7 +85,7 @@ module VGA_Controller(
                         Bit4Counter (
                         .CLK(CLK),
                         .RESET(RESET),
-                        .ENABLE(Bit27TriggerOut),
+                        .ENABLE(sec_en),
                         .COUNT(sec0),
                         .TRIG_OUT(SEC0)
                         );
@@ -168,6 +169,7 @@ module VGA_Controller(
     reg VGABusWE;
     reg [7:0] pre_colour = 8'h01;
     reg [7:0] Out;
+    reg Addr_Hit;
 
     // Tristate
     assign BUS_DATA = (VGABusWE) ? Out : 8'hZZ;
@@ -210,10 +212,6 @@ module VGA_Controller(
                     end
                 end
 
-                8'hB4: begin
-                    A_WE <= 1'b0;
-
-                end
                 default: A_WE <= 1'b0;
             endcase
         end
@@ -230,5 +228,19 @@ module VGA_Controller(
 
         Out <= A_DATA_OUT;
     end
+
+    always@(posedge CLK) begin
+        if(BUS_WE && BUS_ADDR == 8'hB4)
+            Addr_Hit <= 1'b1;
+        else
+            Addr_Hit <= 1'b0;
+    end
+
+    EdgeDetector totime (
+        .CLK(CLK),
+        .RESET(RESET),
+        .ORIGINAL(Addr_Hit),
+        .SAMPLED(sec_en)
+    );
 
 endmodule

@@ -63,7 +63,7 @@ module VGA_Sig_Gen(
                     )
                     HorzCounter(
                           .CLK(CLK),
-                          .RESET(RESET),
+                          .RESET(1'b0),
                           .ENABLE(DPR_CLK),
                           .TRIG_OUT(HorzCountTriggOut),
                           .COUNT(HCounter)
@@ -75,7 +75,7 @@ module VGA_Sig_Gen(
                       )
                       VertCounter(
                             .CLK(CLK),
-                            .RESET(RESET),
+                            .RESET(1'b0),
                             .ENABLE(HorzCountTriggOut),
                             .COUNT(VCounter)
                             );
