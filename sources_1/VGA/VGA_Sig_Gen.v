@@ -94,7 +94,6 @@ module VGA_Sig_Gen(
 
 
     //Decide when the Vertical Sync set high or low
-
         if (VCounter <= VertTimeToPulseWidthEnd)
             VGA_VS <= 0;
         else
@@ -103,7 +102,6 @@ module VGA_Sig_Gen(
 
 
      //Make the Vertical address increase at the same speed as the two counters
-
         if((VertTimeToBackPorchEnd < VCounter) && (VCounter <= VertTimeToDisplayTimeEnd))
            ADDRV <= VCounter- VertTimeToBackPorchEnd;
         else
@@ -111,7 +109,6 @@ module VGA_Sig_Gen(
 
 
      //Make the Horizontal address increase at the same speed as the two counters
-
         if ((HorzTimeToBackPorchEnd < HCounter) && (HCounter <= HorzTimeToDisplayTimeEnd))
             ADDRH <= HCounter-HorzTimeToBackPorchEnd;
        else

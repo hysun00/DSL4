@@ -192,8 +192,8 @@ module MouseTransceiver(input RESET,
     always@(posedge CLK) begin
         if (RESET) begin
             MouseStatus <= 0;
-            // MouseX      <= MouseLimitX/2;
-            // MouseY      <= MouseLimitY/2;
+            MouseX      <= MouseLimitX/2;
+            MouseY      <= MouseLimitY/2;
         end
 
         else if (SendInterrupt) begin
