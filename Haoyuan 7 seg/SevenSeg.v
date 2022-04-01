@@ -26,12 +26,13 @@ module SevenSeg
   input RESET,
   input BUS_WE,
   input  [7:0] BUS_ADDR,
-  input  [7:0] BUS_DATA,  
+  input  [7:0] BUS_DATA,
   output [3:0] SEL,
   output [7:0] DIGIT
 );
 
 wire [7:0] data_out;
+wire clk_sm;
 
 // *****************************
 // Bus Interface
@@ -49,17 +50,33 @@ U_BusInterfaceSevenSeg
 // *****************************
 
 // *****************************
+// Working clock for state machine
+// 50% duty, 0 phase shift
+// *****************************
+TenHz_cnt
+#(
+    .IN_MHZ       (100),
+    .OUT_KHZ      (40),
+    .COUNTER_WIDTH(12)
+)
+CLOCK_DIVIDER_40KHZ
+(
+    .CLK    (CLK),
+    .RESET  (RESET),
+    .CLK_OUT(clk_sm)
+);
+// *****************************
+
+// *****************************
 // Seven-segment state machine
 // *****************************
 SevenSegSM
 U_SevenSegSM
 (
-    .CLK     (CLK),
+    .CLK     (clk_sm),
     .RESET   (RESET),
     .COMMAND (data_out[3:0]),
     .SEL     (SEL),
     .DIGIT   (DIGIT)
 );
 // *****************************
-
-endmodule
