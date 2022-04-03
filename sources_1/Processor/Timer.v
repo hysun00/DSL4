@@ -34,7 +34,7 @@ module Timer
 );
 
 localparam [7:0] TimerBaseAddr   = 8'hF0;// Timer Base Address in the Memory Map
-localparam InitialIterruptRate   = 100;  // Default interrupt rate leading to 1 interrupt every 100 ms
+localparam InitialIterruptRate   = 100;  // Default interrupt rate leading to 1 interrupt every 1s
 localparam InitialIterruptEnable = 1'b1; // By default the Interrupt is Enabled
 //////////////////////
 //BaseAddr + 0 -> reports current timer value

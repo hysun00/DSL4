@@ -32,8 +32,8 @@ module MouseTransceiver(input RESET,
                         output [7:0] MouseZ);
 
     // X, Y Limits of Mouse Position e.g. VGA Screen with 160 x 120 resolution
-    parameter [7:0] MouseLimitX = 160;
-    parameter [7:0] MouseLimitY = 120;
+    localparam [7:0] MouseLimitX = 160;
+    localparam [7:0] MouseLimitY = 120;
     /////////////////////////////////////////////////////////////////////
     //TriState Signals
     //Clk
@@ -216,18 +216,5 @@ module MouseTransceiver(input RESET,
                 MouseY <= MouseNewY[7:0];
         end
     end
-
-// To enable debugging, uncomment the following lines
-//    ila_0 ILA_debugger (
-//        .clk(CLK),
-
-//        .probe0(RESET),             //input wire [0:0] probe0
-//        .probe1(CLK_MOUSE),         //input wire [0:0] probel
-//        .probe2(DATA_MOUSE),        //input wire [0:0] probe2
-//        .probe3(ByteErrorCode),     //input wire [1:0] probe3
-//        .probe4(MasterStateCode),   //input wire [5:0] probe4
-//        .probe5(ByteToSendToMouse), //input wire [7:0] probe5
-//        .probe6(ByteRead)           //input wire [7:0] probe6
-//    );
 
 endmodule

@@ -1,4 +1,23 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:
+// Engineer:
+//
+// Create Date: 01.04.2022 10:53:26
+// Design Name:
+// Module Name: Frame_Buffer
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+//
+//////////////////////////////////////////////////////////////////////////////////
 
 module Frame_Buffer(
     /// Port A - Read/Write
@@ -17,7 +36,7 @@ module Frame_Buffer(
     //The LSBs of the address correspond to the X axis, and the MSBs to the Y axis
     reg [0:0] Mem [2**15-1:0];
 
-    initial $readmemh("VGA_INIT.txt", Mem);
+    initial $readmemh("VGA_INIT.txt", Mem); // Initialize the names
 
     // Port A - Read/Write e.g. to be used by microprocessor
     always@(posedge A_CLK) begin

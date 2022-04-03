@@ -22,7 +22,7 @@
 /*
     Top wrapper for PS/2 Mouse
     Extra features:
-    1. Add support for scrolling wheel using Microsoft Intellimouse Extensions, seein in MouseMasterSM.v. By scrolling wheel, the result is displayed with the 8 MSB LEDs.
+    1. Add support for scrolling wheel using Microsoft Intellimouse Extensions, seen in MouseMasterSM.v. By scrolling wheel, the result is displayed with the 8 MSB LEDs.
     2. Add support for changing the DPI by changing the result of MouseDxRaw and MouseDyRaw
 */
 module PS2_MOUSE(input RESET,
@@ -61,7 +61,7 @@ module PS2_MOUSE(input RESET,
     reg [7:0] Out;
     reg MOUSEBusWE;
 
-    //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
+    // Only place data on the bus if the processor is NOT writing, and it is addressing this memory
     assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
     assign BufferedBusData = BUS_DATA;
 
@@ -82,7 +82,7 @@ module PS2_MOUSE(input RESET,
                 end
 
                 8'hA2: begin
-                    Out <= 8'd120 - MouseY;
+                    Out <= 8'd120 - MouseY; // Upside down the y address
                     MOUSEBusWE <= 1'b1;
                 end
 
