@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module SevenSeg(
+module SevenSeg_1(
     input CLK,
     input RESET,
     inout [7:0] BUS_DATA,
@@ -71,14 +71,6 @@ module SevenSeg(
         .HEX_OUT(HEX_OUT)
         );
 
-    wire [7:0] BufferedBusData;
-    reg [7:0] Out;
-    reg MOUSEBusWE;
-
-    //Only place data on the bus if the processor is NOT writing, and it is addressing this memory
-    assign BUS_DATA = (MOUSEBusWE) ? Out : 8'hZZ;
-    assign BufferedBusData = BUS_DATA;
-
     always @(posedge CLK) begin
         if(RESET) begin
             MouseX <= 0;
@@ -86,24 +78,8 @@ module SevenSeg(
         end
         else if(BUS_WE) begin
             case(BUS_ADDR)
-                8'hD0: MouseX <= BufferedBusData;
-                8'hD1: MouseY <= BufferedBusData;
-            endcase
-            MOUSEBusWE <= 1'b0;
-        end
-        else begin
-            case(BUS_ADDR)
-                8'hD0: begin
-                    Out <= MouseX;
-                    MOUSEBusWE <= 1'b1;
-                end
-
-                8'hD1: begin
-                    Out <= MouseY;
-                    MOUSEBusWE <= 1'b1;
-                end
-
-                default: MOUSEBusWE <= 1'b0;
+                8'hD0: MouseX <= BUS_DATA;
+                8'hD1: MouseY <= BUS_DATA;
             endcase
         end
     end

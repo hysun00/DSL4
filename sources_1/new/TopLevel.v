@@ -27,7 +27,7 @@ module TOP (input CLK,
             output [3:0] SEL,
             inout CLK_MOUSE,
             inout DATA_MOUSE,
-            input [15:0] SW,          // Change DPI using the 2 LSB switches
+            input [3:0] SW,          // Change DPI using the 2 LSB switches
             output [15:0] LEDS,
             output VGA_HS,
             output VGA_VS,
@@ -111,12 +111,13 @@ module TOP (input CLK,
         .DPI(SW[1:0])
     );
 
-    SevenSeg U_SevenSeg (
+    seg7decoder U_SevenSeg (
         .CLK      (CLK),
         .RESET    (RESET),
         .BUS_DATA (bus_data),
         .BUS_ADDR (bus_addr),
         .BUS_WE   (bus_write_en),
+        .MOD_SEL  (SW[3]),
         .SEL      (SEL),
         .DIGIT    (DIGIT)
     );

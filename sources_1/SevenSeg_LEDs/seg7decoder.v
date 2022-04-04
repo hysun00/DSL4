@@ -25,20 +25,20 @@ module seg7decoder
     input  CLK,
     input  RESET,
     input  BUS_WE,
-    input  BUS_ADDR,
-    input  BUS_DATA,
-    input  MOD_SEL,
-    output SEL,
-    output DIGIT
+    input [7:0]  BUS_ADDR,
+    input [7:0] BUS_DATA,
+    input MOD_SEL,
+    output [3:0] SEL,
+    output [7:0] DIGIT
 );
 
 // *****************************
 // Internal signals.
 // *****************************
-wire sel_1;
-wire digit_1;
-wire sel_2;
-wire digit_2;
+wire [3:0] sel_1;
+wire [7:0] digit_1;
+wire [3:0] sel_2;
+wire [7:0] digit_2;
 // *****************************
 
 // *****************************
@@ -53,7 +53,7 @@ U_SevenSeg_1
     .BUS_ADDR(BUS_ADDR),
     .BUS_WE  (BUS_WE),
     .SEG_SELECT_OUT     (sel_1),
-    .HEX_OUT   (digit_1),
+    .HEX_OUT   (digit_1)
 );
 // *****************************
 
@@ -69,7 +69,7 @@ U_SevenSeg_2
     .BUS_ADDR(BUS_ADDR),
     .BUS_DATA(BUS_DATA),
     .SEL     (sel_2),
-    .DIGIT   (digit_2),
+    .DIGIT   (digit_2)
 );
 // *****************************
 
@@ -77,6 +77,9 @@ U_SevenSeg_2
 // Digit output
 // *****************************
 mux_2_to_1
+#(
+   .WIDTH (8)
+)
 U1_mux_2_to_1
 (
     .IN0(digit_1),
@@ -90,6 +93,9 @@ U1_mux_2_to_1
 // Selection bits output
 // *****************************
 mux_2_to_1
+#(
+   .WIDTH (4)
+)
 U2_mux_2_to_1
 (
     .IN0(sel_1),

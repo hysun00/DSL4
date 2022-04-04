@@ -21,13 +21,16 @@
 
 
 module mux_2_to_1
+#(
+    WIDTH = 8
+)
 (
-    input IN0,
-    input IN1,
-    input MUX_SEL,
-    output OUT
+    input  [WIDTH-1 : 0] IN0,
+    input  [WIDTH-1 : 0] IN1,
+    input  MUX_SEL,
+    output [WIDTH-1 : 0] OUT
 );
 
-assign OUT = SEL? IN1 : IN0;
+assign OUT = MUX_SEL ? IN1 : IN0;
 
 endmodule

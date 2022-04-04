@@ -82,7 +82,7 @@ module PS2_MOUSE(input RESET,
                 end
 
                 8'hA2: begin
-                    Out <= 8'd120 - MouseY; // Upside down the y address
+                    Out <= 8'd119 - MouseY; // Upside down the y address
                     MOUSEBusWE <= 1'b1;
                 end
 

@@ -36,7 +36,7 @@ module Frame_Buffer(
     //The LSBs of the address correspond to the X axis, and the MSBs to the Y axis
     reg [0:0] Mem [2**15-1:0];
 
-    initial $readmemh("VGA_INIT.txt", Mem); // Initialize the names
+    initial $readmemh("InitialVGAFrameBuffer.txt", Mem); // Initialize the names
 
     // Port A - Read/Write e.g. to be used by microprocessor
     always@(posedge A_CLK) begin
