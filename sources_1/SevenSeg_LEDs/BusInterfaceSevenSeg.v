@@ -22,7 +22,7 @@
 
 module BusInterfaceSevenSeg
 #(
-    parameter IO_ADDRESS = 8'hD0
+    parameter IO_ADDRESS = 8'hD2
 )
 (
     input  CLK,
