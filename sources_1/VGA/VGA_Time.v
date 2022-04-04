@@ -78,7 +78,6 @@ module VGA_Time(
                         .COUNT(min0),
                         .TRIG_OUT(MIN0)
                         );
-
     Generic_counter # (.COUNTER_WIDTH(3),
                         .COUNTER_MAX(5)
                         )
@@ -96,7 +95,7 @@ module VGA_Time(
             numbery <= ADDRV - number_starty;
             number_addr = numbery * number_width + numberx;
 
-            VGA_DATA=Time_RAM[number_addr][sec0];
+            VGA_DATA = Time_RAM[number_addr][sec0];
         end
 
         // The second bit of the second
@@ -105,7 +104,7 @@ module VGA_Time(
             numbery <= ADDRV - number_starty;
             number_addr = numbery * number_width + numberx;
 
-            VGA_DATA=Time_RAM[number_addr][sec1];
+            VGA_DATA = Time_RAM[number_addr][sec1];
         end
 
         // The quotation mark
@@ -114,7 +113,7 @@ module VGA_Time(
             numbery <= ADDRV - number_starty;
             number_addr = numbery * number_width + numberx;
 
-            VGA_DATA=Time_RAM[number_addr][10];
+            VGA_DATA = Time_RAM[number_addr][10];
         end
 
         // The first bit of the minute

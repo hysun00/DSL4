@@ -121,7 +121,7 @@ module TOP (input CLK,
         .DIGIT    (DIGIT)
     );
 
-    LEDs_Module led(
+    LED led(
         .CLK(CLK),
         .RESET(RESET),
         .BUS_DATA(bus_data),
