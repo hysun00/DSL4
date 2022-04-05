@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+// Company: The University of Edinburgh
 // Engineer:
 //
 // Create Date: 09.03.2022 17:14:43
@@ -25,11 +25,29 @@ module IRTransmitter
     parameter IO_ADDRESS            = 8'h90,
     parameter IN_MHZ                = 100,
     parameter SM_KHZ                = 40,
-    parameter START_BURST_SIZE      = 88,
-    parameter CAR_SELECT_BURST_SIZE = 22,
-    parameter GAP_SIZE              = 40,
-    parameter ASSERT_BURST_SIZE     = 44,
-    parameter DEASSERT_BURST_SIZE   = 22
+
+// Blue car
+     parameter START_BURST_SIZE      = 191,
+     parameter CAR_SELECT_BURST_SIZE = 47,
+     parameter GAP_SIZE              = 25,
+     parameter ASSERT_BURST_SIZE     = 47,
+     parameter DEASSERT_BURST_SIZE   = 25,
+
+//Red car
+//    parameter START_BURST_SIZE      = 192,
+//    parameter CAR_SELECT_BURST_SIZE = 24,
+//    parameter GAP_SIZE              = 24,
+//    parameter ASSERT_BURST_SIZE     = 48,
+//    parameter DEASSERT_BURST_SIZE   = 24,
+
+// Yellow car
+    // parameter START_BURST_SIZE      = 88,
+    // parameter CAR_SELECT_BURST_SIZE = 22,
+    // parameter GAP_SIZE              = 40,
+    // parameter ASSERT_BURST_SIZE     = 44,
+    // parameter DEASSERT_BURST_SIZE   = 22
+
+    parameter COUNTER_WIDTH         = 12
 )
 (
  // INPUT

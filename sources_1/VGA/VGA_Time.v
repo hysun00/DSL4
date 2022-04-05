@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
+// Company: The University of Edinburgh
+// Engineer: Yichen Zhang
 //
 // Create Date: 01.04.2022 10:53:26
 // Design Name:

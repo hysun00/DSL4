@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+// Company: The University of Edinburgh
 // Engineer:
 //
 // Create Date: 15.03.2022 09:52:38
 // Design Name:
-// Module Name: LEDs_Module
+// Module Name: LED
 // Project Name:
 // Target Devices:
 // Tool Versions:

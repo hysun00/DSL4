@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+// Company: The University of Edinburgh
 // Engineer:
 //
 // Create Date: 01.04.2022 10:51:29

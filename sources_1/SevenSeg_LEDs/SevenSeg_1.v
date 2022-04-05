@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+// Company: The University of Edinburgh
 // Engineer:
 //
 // Create Date: 15.03.2022 10:22:08
 // Design Name:
-// Module Name: SevenSeg
+// Module Name: SevenSeg_1
 // Project Name:
 // Target Devices:
 // Tool Versions:

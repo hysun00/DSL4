@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company: The University of Edinburgh
+// Engineer:
+//
 // Create Date: 04.04.2022 16:32:48
-// Design Name: 
+// Design Name:
 // Module Name: seg7decoder
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -44,8 +44,8 @@ wire [7:0] digit_2;
 // *****************************
 // 0xD0 to 0xD1
 // *****************************
-SevenSeg_1 
-U_SevenSeg_1 
+SevenSeg_1
+U_SevenSeg_1
 (
     .CLK(CLK),
     .RESET(RESET),

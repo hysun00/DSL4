@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company:
+// Company: The University of Edinburgh
 // Engineer:
 //
 // Create Date: 2020/10/26 05:44:14
 // Design Name:
-// Module Name: Multiplexer_4way
+// Module Name: Multiplexer_4way_1
 // Project Name:
 // Target Devices:
 // Tool Versions:

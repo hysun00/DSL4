@@ -1,14 +1,14 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Company: The University of Edinburgh
-// Engineer: Haoyuan Sun
+// Engineer: Haoyuan Sun, Yichen Zhang, Lushan Lee
 //
 // Create Date: 09.03.2022 16:53:20
-// Design Name:
+// Design Name: Digital System Laboratory
 // Module Name: TOP
-// Project Name:
-// Target Devices:
-// Tool Versions:
+// Project Name: Digital System Laboratory
+// Target Devices: XC7A35T-ICPG236C
+// Tool Versions: 2015.2
 // Description:
 //
 // Dependencies:
@@ -19,7 +19,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-
+/* Top module
+   Extra Features:
+   1. Mouse scroll, shown on 8-bit MSB LEDs
+   2. Mouse DPI control, by the 2 LSB switches
+   3. Name display on VGA screens, seen InitialVGAFrameBuffer.txt
+   4. Clock time display on the centre of VGA display, seen VGA_Time.v and Numbers_VGA_RAM.txt
+   5. VGA colour change by the mouse scroll, background or foreground controlled by the third switch
+   6. 7-segment display switch between mouse address and IR car direction by the fourth switch
+   7. Multiple function calls of the microprocessor, realised by an 8-bit stack, seen Line 369 of Processor.v
+   8. Load immediate number to reg A and B, instruction code: 0x0D for reg A and 0x1D for reg B, seen Line 415 of Processor.v
+*/
 module TOP (input CLK,
             input RESET,
             output IR_LED,
