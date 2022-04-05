@@ -27,7 +27,7 @@ module TOP (input CLK,
             output [3:0] SEL,
             inout CLK_MOUSE,
             inout DATA_MOUSE,
-            input [3:0] SW,          // Change DPI using the 2 LSB switches
+            input [3:0] SW,          // Change DPI using the 2 LSB switches, Change background or foreground color by SW[2], Change 7seg display by SW[3]
             output [15:0] LEDS,
             output VGA_HS,
             output VGA_VS,
@@ -119,7 +119,7 @@ module TOP (input CLK,
         .BUS_DATA (bus_data),
         .BUS_ADDR (bus_addr),
         .BUS_WE   (bus_write_en),
-        .MOD_SEL  (SW[3]),
+        .MOD_SEL  (SW[3]),  // Change 7seg display to IR or Mouse
         .SEL      (SEL),
         .DIGIT    (DIGIT)
     );
@@ -143,7 +143,7 @@ module TOP (input CLK,
         .BUS_DATA  (bus_data),
         .BUS_ADDR  (bus_addr),
         .BUS_WE    (bus_write_en),
-        .BACKFORE  (SW[2]),
+        .BACKFORE  (SW[2]),     // Background or foreground colour to change
         .VGA_COLOUR(VGA_COLOUR),
         .VGA_HS    (VGA_HS),
         .VGA_VS    (VGA_VS)

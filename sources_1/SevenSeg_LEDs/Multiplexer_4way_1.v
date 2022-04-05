@@ -1,26 +1,26 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 2020/10/26 05:44:14
-// Design Name: 
+// Design Name:
 // Module Name: Multiplexer_4way
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Multiplexer_4way(
+module Multiplexer_4way_1(
     input [1:0] CONTROL,
     input [4:0] IN0,
     input [4:0] IN1,
@@ -28,7 +28,7 @@ module Multiplexer_4way(
     input [4:0] IN3,
     output reg [4:0] OUT
     );
-    
+
     always@(CONTROL or IN0 or IN1 or IN2 or IN3) begin
         case(CONTROL)
             2'b00 : OUT <= IN0;
@@ -38,5 +38,5 @@ module Multiplexer_4way(
             default : OUT <= 5'b00000;
         endcase
     end
-    
+
 endmodule

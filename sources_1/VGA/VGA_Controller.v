@@ -3,7 +3,7 @@
 // Company:
 // Engineer:
 //
-// Create Date: 01.04.2022 10:53:26
+// Create Date: 01.04.2022 10:51:29
 // Design Name:
 // Module Name: VGA_Controller
 // Project Name:

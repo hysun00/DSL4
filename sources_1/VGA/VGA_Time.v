@@ -19,7 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-
+// This module decodes the clock to be displayed on the centre of the screen
 module VGA_Time(
     input CLK,
     input RESET,
@@ -48,10 +48,11 @@ module VGA_Time(
     initial $readmemb("Numbers_VGA_RAM.txt", Time_RAM);
 
 
+    // Second and minute counters
     Generic_counter # (.COUNTER_WIDTH(4),
                         .COUNTER_MAX(9)
                         )
-                        Bit4Counter (
+                        SEC0Counter (
                         .CLK(CLK),
                         .RESET(RESET),
                         .ENABLE(sec_en),
@@ -61,7 +62,7 @@ module VGA_Time(
     Generic_counter # (.COUNTER_WIDTH(3),
                         .COUNTER_MAX(5)
                         )
-                        Bit3Counter (
+                        SEC1Counter (
                         .CLK(CLK),
                         .RESET(RESET),
                         .ENABLE(SEC0),
@@ -71,7 +72,7 @@ module VGA_Time(
     Generic_counter # (.COUNTER_WIDTH(4),
                         .COUNTER_MAX(9)
                         )
-                        Bit4Counter2 (
+                        MIN0Counter (
                         .CLK(CLK),
                         .RESET(RESET),
                         .ENABLE(SEC1),
@@ -81,7 +82,7 @@ module VGA_Time(
     Generic_counter # (.COUNTER_WIDTH(3),
                         .COUNTER_MAX(5)
                         )
-                        Bit3Counter2 (
+                        MIN1Counter (
                         .CLK(CLK),
                         .RESET(RESET),
                         .ENABLE(MIN0),
@@ -152,7 +153,7 @@ module VGA_Time(
         .CLK(CLK),
         .RESET(RESET),
         .ORIGINAL(Addr_Hit),
-        .SAMPLED(sec_en)
+        .SAMPLED(sec_en)    // Counter enable signal
     );
 
 endmodule

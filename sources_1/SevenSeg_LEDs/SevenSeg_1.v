@@ -54,7 +54,7 @@ module SevenSeg_1(
                         .COUNT(SEG_SELECT_IN)
                         );
 
-    Multiplexer_4way Mux4 (
+    Multiplexer_4way_1 Mux4 (
         .CONTROL(SEG_SELECT_IN),
         .IN0({1'b0,MouseY[3:0]}),
         .IN1({1'b0,MouseY[7:4]}),
@@ -63,7 +63,7 @@ module SevenSeg_1(
         .OUT(MuxOut)
         );
 
-    Seg7Display Display (
+    SegDecoder_1 Display (
         .SEG_SELECT_IN(SEG_SELECT_IN),
         .BIN_IN(MuxOut[3:0]),
         .DOT_IN(MuxOut[4]),

@@ -3,7 +3,7 @@
 // Company:
 // Engineer:
 //
-// Create Date: 01.04.2022 10:53:26
+// Create Date: 01.04.2022 10:52:23
 // Design Name:
 // Module Name: VGA_Sig_Gen
 // Project Name:

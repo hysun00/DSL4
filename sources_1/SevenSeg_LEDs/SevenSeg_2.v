@@ -70,7 +70,7 @@ CLOCK_DIVIDER_40KHZ
 // *****************************
 // Seven-segment state machine
 // *****************************
-SevenSegSM
+SevenSegSM_2
 U_SevenSegSM
 (
     .CLK     (clk_sm),

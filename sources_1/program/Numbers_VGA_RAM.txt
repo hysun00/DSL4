@@ -1,3 +1,7 @@
+// Encoded numbers 0-9 and the quotation mark on VGA display
+// MSB: quotation mark
+// 9 - 0
+// LSB: 0
 00000000000
 00000000000
 00000000000

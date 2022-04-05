@@ -1,33 +1,33 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
+// Company:
+// Engineer:
+//
 // Create Date: 2020/10/20 05:24:44
-// Design Name: 
+// Design Name:
 // Module Name: Decoding_Simpler
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-// 
+//
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Seg7Display(
+module SegDecoder_1(
     input [1:0] SEG_SELECT_IN,
     input [3:0] BIN_IN,
     input DOT_IN,
     output reg [3:0] SEG_SELECT_OUT,
     output reg [7:0] HEX_OUT
     );
-    
+
     //segment selection case statemnet
     always@(SEG_SELECT_IN) begin
         case(SEG_SELECT_IN)
@@ -38,7 +38,7 @@ module Seg7Display(
             default: SEG_SELECT_OUT <= 4'b1111;
         endcase
     end
-    
+
     //connect 4-bit input to 8-bit 7-segment display output
     always@(BIN_IN or DOT_IN) begin
         case(BIN_IN)
@@ -62,5 +62,5 @@ module Seg7Display(
         endcase
         HEX_OUT[7] <= ~DOT_IN;
     end
-            
+
 endmodule

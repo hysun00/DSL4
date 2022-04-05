@@ -24,7 +24,7 @@ module Number_TB(
 
     );
     
-    reg [10:0] Time_RAM [86*86:0];
+    reg [10:0] Time_RAM [44*31:0];
     initial $readmemb("Numbers_VGA_RAM.txt", Time_RAM);
     
     reg CLK=1;
@@ -32,8 +32,8 @@ module Number_TB(
     wire [9:0] ADDRH,ADDRV;
     wire HorzCountTriggOut;
     reg [9:0] out;
-    Generic_counter # (.COUNTER_WIDTH(10),
-                        .COUNTER_MAX(62)
+    Generic_counter # (.COUNTER_WIDTH(6),
+                        .COUNTER_MAX(44)
                         )
                         HorzCounter(
                               .CLK(CLK),
@@ -44,8 +44,8 @@ module Number_TB(
                                );
     
         //Increment VCounter by one every clock cycle when HCounter is reseted. Range 0 to 520
-        Generic_counter # (.COUNTER_WIDTH(9),
-                          .COUNTER_MAX(87)
+        Generic_counter # (.COUNTER_WIDTH(5),
+                          .COUNTER_MAX(31)
                           )
                           VertCounter(
                                 .CLK(CLK),
