@@ -88,17 +88,21 @@ reg  NextBusDataOutWE;
 
 // Operation selection.
 localparam [7:0] CHOOSE_OPP              = 8'h00;// Decoding instruction
-//Data transfer (direct addressing)
+/////////////////////////Data transfer (direct addressing)/////////////////////////
 localparam [7:0] READ_FROM_MEM_TO_A      = 8'h10;// Wait for the address being read from ROM, select reg A.
 localparam [7:0] READ_FROM_MEM_TO_B      = 8'h11;// Wait for the address being read from ROM, select reg B.
+//read immdiate number from instruction mem, it takes 3 clock cycles.
 localparam [7:0] READ_FROM_MEM_0         = 8'h12;// Set BUS_ADDR to designated address.
-localparam [7:0] READ_FROM_MEM_1         = 8'h13;// Wait for the data being read. Increment the PC by 2.
+localparam [7:0] READ_FROM_MEM_1         = 8'h13;// Wait for the data being read from ROM. Increment the PC by 2 since this instruction contains a 8-bit immdiate number.
 localparam [7:0] READ_FROM_MEM_2         = 8'h14;// Write the data to chosen register, end op.
+//Write the address bus
 localparam [7:0] WRITE_TO_MEM_FROM_A     = 8'h20;// Wait for the memory address being read from ROM.
 localparam [7:0] WRITE_TO_MEM_FROM_B     = 8'h21;// Wait for the address being read from ROM.
-localparam [7:0] WRITE_TO_MEM_0          = 8'h22;// Write data to data bus by the designated address
-localparam [7:0] WRITE_TO_MEM_1          = 8'h23;// Write data to data bus by the designated address
-//Data Manipulation
+//Write data to data bus by the designated address, it takes two clock cycles
+localparam [7:0] WRITE_TO_MEM_0          = 8'h22;
+localparam [7:0] WRITE_TO_MEM_1          = 8'h23;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////Data Manipulation//////////////////////////////
 localparam [7:0] DO_MATHS_OPP_SAVE_IN_A  = 8'h30;// The result of maths op. is available, save it to Reg A.
 localparam [7:0] DO_MATHS_OPP_SAVE_IN_B  = 8'h31;// The result of maths op. is available, save it to Reg B.
 localparam [7:0] DO_MATHS_OPP_0          = 8'h32;// Wait for new prog address to settle.
@@ -217,7 +221,8 @@ always@(*) begin
     NextProgContext[7]  = CurrProgContext[7];
     NextInterruptAck = 2'b00;
     case (CurrState)
-////////////////////////////////////Thread states////////////////////////////////////
+////////////////////////////////////Thread states/////////////////////////////////////
+// In the idle state, we wait the interrupt request to wake up the thread
         IDLE: begin
             if(BUS_INTERRUPTS_RAISE[0]) begin      // Interrupt Request A.
                 NextState        = GET_THREAD_START_ADDR_0;
@@ -236,14 +241,17 @@ always@(*) begin
             end
         end
 
+// we use three clock periods to fetch the instruction from ROM
         GET_THREAD_START_ADDR_0: NextState = GET_THREAD_START_ADDR_1;
 
         GET_THREAD_START_ADDR_1: begin
             NextState = GET_THREAD_START_ADDR_2;
-            NextPC    = ProgMemoryOut;
+            NextPC    = ProgMemoryOut; 
         end
 
-        GET_THREAD_START_ADDR_2: NextState = CHOOSE_OPP;
+        GET_THREAD_START_ADDR_2: NextState = CHOOSE_OPP; 
+//instruction fetched, decode it next
+        
 /////////////////////////////////Operation Selection/////////////////////////////////
         CHOOSE_OPP: begin
             case (ProgMemoryOut[3:0])
